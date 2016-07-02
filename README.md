@@ -40,7 +40,7 @@ Connections
 + Register your wifi network
 	+ In the lua shell run 
 		+ wifi.setmode(wifi.STATION)
-		+ wifi.sta.config("<your SSID>","<your key>")
+		+ wifi.sta.config("your SSID","your key")
 		+ wifi.sta.autoconnect(1)
 		+ wifi.sta.connect()
 	+ Your ESP8266 will remember your wifi settings!
