@@ -19,7 +19,7 @@ In order to run a LoRaWanGateway you need
 
 Connections
 <table>
-<th><td>ESP PIN</td><td>SX1276 PIN</td></th>
+<tr><th>ESP PIN</th><th>SX1276 PIN</th></tr>
 <tr><td>D1</td><td>DIO0</td></tr>
 <tr><td>D2</td><td>DIO1</td></tr>
 <tr><td>D5</td><td>SCK</td></tr>
