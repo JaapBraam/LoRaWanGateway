@@ -18,16 +18,17 @@ In order to run a LoRaWanGateway you need
 + A way to flash your ESP8266
 
 Connections
-ESP PIN | SX1276 PIN
---- | ---
-D1 | DIO0
-D2 | DIO1
-D5 | SCK
-D6 | MISO
-D7 | MOSI
-D8 | NSS
-GND | GND
-3.3V | VCC
+<table>
+<th><td>ESP PIN</td><td>SX1276 PIN</td></th>
+<tr><td>D1</td><td>DIO0</td></tr>
+<tr><td>D2</td><td>DIO1</td></tr>
+<tr><td>D5</td><td>SCK</td></tr>
+<tr><td>D6</td><td>MISO</td></tr>
+<tr><td>D7</td><td>MOSI</td></tr>
+<tr><td>D8</td><td>NSS</td></tr>
+<tr><td>GND</td><td>GND</td></tr>
+<tr><td>3.3V</td><td>VCC</td></tr>
+</table>
 
 ## How to run
 + Get the NodeMCU firmware on http://nodemcu-build.com/index.php 
