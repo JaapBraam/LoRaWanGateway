@@ -50,6 +50,8 @@ Connections
 
 The LoRaWanGateway is configured to listen on EU channel 0, SF7BW125
 
+It will only listen on a specific channel, but will send on whatever channel or datarate the router seems fit...
+
 
 
 
