@@ -9,8 +9,8 @@ A LoRaWan Gateway in LUA
 
 ## Why LUA?
 Lua is an event driven language, which is a good match for a gateway: a gateway has to respond to incoming messages from nodes and routers.
-The LoraWanGateway runs on a ESP8266 chip, with the NodeMCU firmware it runs a full WiFi stack and a lua interpreter. The NodeMCU contains a 
-lot of libraries that are usefull for a gateway: NTP support, 6 timers, json support etc. 
+The LoraWanGateway runs on a ESP8266 chip, with the NodeMCU firmware it runs a full WiFi stack and a lua runtime. The NodeMCU contains a 
+lot of libraries that are usefull for a gateway: WiFi, NTP support, SPI, 6 timers, json support etc.
 
 ## Hardware
 In order to run a LoRaWanGateway you need
@@ -32,6 +32,10 @@ Connections
 </table>
 
 ## How to run
+
+The LoRaWanGateway needs quite some RAM and processing power, so it it necessary to flash firmware that uses as little resources as possible. 
+Therefore you have to build NodeMCU firmware containing only the modules needed.
+
 + Get the NodeMCU firmware on http://nodemcu-build.com/index.php 
 	+ select the dev branch
 	+ select the following modules: bit,cjson,encoder,file,gpio,net,node,rtctime,sntp,spi,tmr,uart,wifi
