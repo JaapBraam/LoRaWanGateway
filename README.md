@@ -52,7 +52,10 @@ Therefore you have to build NodeMCU firmware containing only the modules needed.
 + Restart your ESP8266
 + The LoRaWanGateway will start after first compiling all your sources
 
+
 The LoRaWanGateway is configured to listen on EU channel 0, SF7BW125
+
+Changing the configuration can be done in init.lua (channel, SF, location of gateway)
 
 It will only listen on a specific channel, but will send on whatever channel or datarate the router seems fit...
 
