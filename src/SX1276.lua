@@ -372,8 +372,8 @@ local function init(dio0,dio1)
   sxInit()
   M.dio0=dio0
   M.dio1=dio1
-  M.ch=0
-  M.sf=MC2.SF7
+  M.ch=GW_CH
+  M.sf=MC2[GW_SF]
 
   M.scanner=continuous
   --M.scanner=manual

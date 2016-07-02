@@ -55,8 +55,8 @@ end
 
 local GW_stat={
   time=gmtime(rtctime.get()),
-  lati=51.9781904,
-  long=5.6691595,
+  lati=GW_LAT,
+  long=GW_LON,
   alti=0,
   rxnb=0,
   rxok=0,

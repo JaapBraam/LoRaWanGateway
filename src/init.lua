@@ -41,3 +41,10 @@ elseif file.exists("LoRaWanGW.lua") then
 else
    require("LoRaWanGW")
 end
+
+-- settings
+GW_CH=0
+GW_SF="SF7"
+-- Gateway location
+GW_LAT=0.0 -- the latitude
+GW_LON=0.0 -- the longitue
