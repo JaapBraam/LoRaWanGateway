@@ -55,8 +55,6 @@ end
 
 local GW_stat={
   time=gmtime(rtctime.get()),
-  lati=GW_LAT,
-  long=GW_LON,
   alti=0,
   rxnb=0,
   rxok=0,
@@ -81,7 +79,7 @@ function stat()
     local ackr=1000*upAcks/upSent
     GW_stat.ackr=string.format("%0d.%0d",ackr/10,ackr%10)
   end
-  local msg=header(0x00)..cjson.encode({stat=GW_stat})
+  local msg=cjson.encode({stat=GW_stat})
   -- fix floats in strings
   msg=msg:gsub('"(%d+)[.](%d+)"','%1.%2')
   radio.rxnb=0
@@ -90,25 +88,16 @@ function stat()
   upSent=0
   upAcks=0
   GW_stat.dwnb=0
-  return msg
+  return header(0x00)..msg
 end
 
-local function rxpk(pkg)
-  local msg=header(0x00)..cjson.encode({rxpk={pkg}})
-  -- fix '4\/5' -> '4/5'
-  msg=string.gsub(msg,"4\\","4")
-  -- fix floats in strings
-  msg=msg:gsub('"(%d+)[.](%d+)"','%1.%2')
-  router_client:send(msg)
-  print("rxpk",encoder.toHex(msg:sub(1,12)),"message",msg:sub(13),"length",msg:len())
-  upSent=upSent+1
-end
 local SNTP_TIMER=4
 local SNTP_INTERVAL=300*1000
 local PUSH_TIMER=5
 local PUSH_INTERVAL=30*1000
 local PULL_TIMER=6
 local PULL_INTERVAL=5*1000
+
 local function start_scheduler(router)
   tmr.alarm(PUSH_TIMER,PUSH_INTERVAL,tmr.ALARM_AUTO,function()
     local msg=stat()
@@ -127,6 +116,17 @@ local function start_scheduler(router)
       print("ntp synced using "..server)
     end)
   end)
+end
+
+local function rxpk(pkg)
+  local msg=header(0x00)..cjson.encode({rxpk={pkg}})
+  -- fix '4\/5' -> '4/5'
+  msg=string.gsub(msg,"4\\","4")
+  -- fix floats in strings
+  msg=msg:gsub('"(%d+)[.](%d+)"','%1.%2')
+  router_client:send(msg)
+  print("rxpk",encoder.toHex(msg:sub(1,12)),"message",msg:sub(13),"length",msg:len())
+  upSent=upSent+1
 end
 
 local function tx_ack(data)
@@ -179,6 +179,8 @@ wifi.sta.eventMonReg(wifi.STA_GOTIP, function()
     print(gmtime(rtctime.get()))
     math.randomseed(us)
     connectRouter()
+    GW_stat.lati=GW_LAT
+    GW_stat.long=GW_LON
     radio=require("SX1276")(1,2)
     radio.rxpk=rxpk
   end)
