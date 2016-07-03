@@ -61,7 +61,7 @@ local GW_stat={
   rxnb=0,
   rxok=0,
   rxfw=0,
-  ackr=0.0,
+  ackr=0, -- float!
   dwnb=0,
   txnb=0,
   pfrm="ESP8266",
@@ -78,9 +78,12 @@ function stat()
   GW_stat.rxnb=radio.rxnb
   GW_stat.rxok=radio.rxok
   if upSent > 0 then
-    GW_stat.ackr=100*upAcks/upSent
+    local ackr=1000*upAcks/upSent
+    GW_stat.ackr=string.format("%0d.%0d",ackr/10,ackr%10)
   end
   local msg=header(0x00)..cjson.encode({stat=GW_stat})
+  -- fix floats in strings
+  msg=msg:gsub('"(%d+)[.](%d+)"','%1.%2')
   radio.rxnb=0
   radio.rxok=0
   radio.txnb=0
@@ -92,7 +95,10 @@ end
 
 local function rxpk(pkg)
   local msg=header(0x00)..cjson.encode({rxpk={pkg}})
-  msg=string.gsub(msg,"\\","")
+  -- fix '4\/5' -> '4/5'
+  msg=string.gsub(msg,"4\\","4")
+  -- fix floats in strings
+  msg=msg:gsub('"(%d+)[.](%d+)"','%1.%2')
   router_client:send(msg)
   print("rxpk",encoder.toHex(msg:sub(1,12)),"message",msg:sub(13),"length",msg:len())
   upSent=upSent+1
@@ -125,8 +131,12 @@ end
 
 local function tx_ack(data)
   local msg=header(0x05,data:byte(2),data:byte(3))
-  local json=cjson.decode(data:sub(5))
+  -- translate freq (Mhz) float to int (Hz) 
+  local fix=data:sub(5):gsub('"freq":(%d+)[.](%d+),',function(d,f) return '"freq":'..(d*1000000+f*1000)..',' end)
+  local json=cjson.decode(fix)
   local resp=radio.txpk(json.txpk)
+  print("txpk",data:sub(5))
+  print("txpk_ack",resp)
   router_client:send(msg..resp)
 end
 

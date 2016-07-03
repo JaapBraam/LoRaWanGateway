@@ -39,7 +39,7 @@ Therefore you have to build NodeMCU firmware containing only the modules needed.
 + Get the NodeMCU firmware on http://nodemcu-build.com/index.php 
 	+ select the dev branch
 	+ select the following modules: bit,cjson,encoder,file,gpio,net,node,rtctime,sntp,spi,tmr,uart,wifi
-+ Flash the float version on your ESP8266
++ Flash the integer version on your ESP8266
 + Format ESP8266 filesystem
 + Register your wifi network
 	+ In the lua shell run 
@@ -59,7 +59,10 @@ Changing the configuration can be done in init.lua (channel, SF, location of gat
 
 It will only listen on a specific channel, but will send on whatever channel or datarate the router seems fit...
 
+## Revisions
 
+2016-07-02 initial revision
+2016-07-03 refactor to use integer version of firmware in order to have more free resources
 
 
  

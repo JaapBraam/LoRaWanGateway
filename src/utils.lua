@@ -22,13 +22,6 @@
 --
 --Author: Jaap Braam
 
-local floor=math.floor
-
-function round(num, idp)
-  local mult = 10^(idp or 0)
-  return floor(num * mult + 0.5) / mult
-end
-
 function padBase64(s)
   local p=4-(#s % 4)
   return s..string.rep("=",p % 4)
@@ -59,7 +52,7 @@ function gmtime(t,us)
     -- First calculate the number of four-year-interval, so calculation
     -- of leap year will be simple. Btw, because 2000 IS a leap year and
     -- 2100 is out of range, this formula is so simple.
-    y=floor(s/FSEC)
+    y=s/FSEC
     s=s-y*FSEC
     y=y*4+BASE_YEAR         -- 1970, 1974, 1978, ...
     if s>=YSEC then
@@ -76,18 +69,18 @@ function gmtime(t,us)
             end
         end
     end
-    j=floor(s/DSEC)
+    j=s/DSEC
     s=s-j*DSEC
     local m=1
     while mdays[m]<j do m=m+1 end
     m=m-1
     local d=(j-mdays[m])
     -- Calculate day of week. Sunday is 0
-    w=(floor(t/DSEC)+BASE_DOW)%7
+    w=(t/DSEC+BASE_DOW)%7
     -- Calculate the time of day from the remaining seconds
-    h=floor(s/3600)
+    h=s/3600
     s=s-h*3600
-    n=floor(s/60)
+    n=s/60
     s=s-n*60
     return string.format('%04d-%02d-%02dT%02d:%02d:%02d.%06dZ',y,m,d,h,n,s,us)
 end
