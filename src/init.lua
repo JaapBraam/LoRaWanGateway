@@ -45,5 +45,6 @@ end
 -- settings
 GW_CH=0
 GW_SF="SF7"
-GW_LAT="51.9781904"
-GW_LON="5.6691595"
+-- gateway location
+GW_LAT="0.0"
+GW_LON="0.0"
