@@ -75,6 +75,7 @@ function stat()
   GW_stat.time=gmtime(rtctime.get())
   GW_stat.rxnb=radio.rxnb
   GW_stat.rxok=radio.rxok
+  GW_stat.txnb=radio.txnb
   if upSent > 0 then
     local ackr=1000*upAcks/upSent
     GW_stat.ackr=string.format("%0d.%0d",ackr/10,ackr%10)
@@ -88,6 +89,7 @@ function stat()
   upSent=0
   upAcks=0
   GW_stat.dwnb=0
+  GW_stat.rxfw=0
   return header(0x00)..msg
 end
 
@@ -127,6 +129,7 @@ local function rxpk(pkg)
   router_client:send(msg)
   print("rxpk",encoder.toHex(msg:sub(1,12)),"message",msg:sub(13),"length",msg:len())
   upSent=upSent+1
+  GW_stat.rxfw=GW_stat.rxfw+1
 end
 
 local function tx_ack(data)
@@ -135,6 +138,7 @@ local function tx_ack(data)
   local fix=data:sub(5):gsub('"freq":(%d+)[.](%d+),',function(d,f) return '"freq":'..(d*1000000+f*1000)..',' end)
   local json=cjson.decode(fix)
   local resp=radio.txpk(json.txpk)
+  GW_stat.dwnb=GW_stat.dwnb+1
   print("txpk",data:sub(5))
   print("txpk_ack",resp)
   router_client:send(msg..resp)
