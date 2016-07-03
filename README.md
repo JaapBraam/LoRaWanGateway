@@ -61,8 +61,8 @@ It will only listen on a specific channel, but will send on whatever channel or 
 
 ## Revisions
 
-2016-07-02 initial revision
-2016-07-03 refactor to use integer version of firmware in order to have more free resources
++ 2016-07-02 initial revision
++ 2016-07-03 refactor to use integer version of firmware in order to have more free resources
 
 
  
