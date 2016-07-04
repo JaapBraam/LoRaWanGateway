@@ -93,8 +93,9 @@ local function pktFreq()
   -- local FRF_MID=0x07
   -- local FRF_LSB=0x08
 
-  local frf=lshift(lshift(read(0x06),8)+read(0x07),8)+read(0x08)
-  return 125*frf/2^11 -- in KHz
+  --local frf=lshift(lshift(read(0x06),8)+read(0x07),8)+read(0x08)
+  --return (125*frf/2^11) -- in KHz
+  return (125000*read(0x08)/2^11)+(125000*read(0x07)/2^3)+(125000*read(0x06)*2^5)
 end
 
 local function pktLsnr()
@@ -157,8 +158,8 @@ local function rxDone()
     pkt.chan=pktChan()
     pkt.rfch=0
     pkt.modu="LORA"
-    local freq=pktFreq() -- in KHz
-    pkt.freq=string.format("%0d.%03d",freq/1000,freq%1000)
+    local freq=pktFreq() -- in Hz
+    pkt.freq=string.format("%0d.%06d",freq/1000000,freq%1000000)
     pkt.rssi=pktRssi()
     pkt.lsnr=pktLsnr()
     pkt.datr=pktDatr()
@@ -251,10 +252,23 @@ local function txBuffer(data)
   --  local PAYLOAD_LENGTH=0x22
   --  local FIFO=0x00
 
-  write(0x0D, read(0x0E))
+  write(0x0D,read(0x0E))
   write(0x22,#data)
   write(0x00,data)
 end
+
+local prevDump={}
+local function dump()
+  print("----------")
+  for r=0x01,0x039 do
+    local v=read(r)
+    local p=prevDump[r] or 0
+    print(string.format("reg %02X = %02X (%02X)",r,v,p))
+    prevDump[r]=v
+  end
+  print("----------")
+end
+
 
 local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   --  local IRQ_FLAGS=0x12
@@ -270,7 +284,7 @@ local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   gpio.mode(M.dio0,gpio.INT)
   gpio.trig(M.dio0,"up",function()
     -- clear TxDone
-    write(0x12, 0x08)
+    write(0x12, 0xFF)
     --print("TxDone")
     M.scanner()
   end)
@@ -288,12 +302,15 @@ local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   print("transmitPkt",tmst-t0,tmst-t1,tmst-t2,freq,sf,bw,cr,powe,#data)
 end
 
+
 local function continuous()
-  --  local OPMODE_STDBY=0x01
+  --  local OPMODE_SLEEP=0x00
   --  local OPMODE_RXCONTINUOUS=0x05
   --  local DIO_MAPPING_1=0x40
 
-  setOpMode(0x01)
+  setOpMode(0x00)
+  --
+  write(0x39,0x34) -- syncword LoRaWan
   -- event handler
   write(0x40,0x00)
   gpio.mode(M.dio0,gpio.INT)
@@ -360,8 +377,8 @@ local function sxInit()
   write(0x39,0x34)
   write(0x0C,0x23)
   write(0x23,0x80)
-  write(0x22,0x01)
-  write(0x22,0x08)
+  write(0x22,0x40)
+  write(0x21,0x08)
   write(0x0A, bor(band(read(0x0A),0xF0),0x08)) --set PA ramp-up time 50 uSec
   write(0x5A,bor(read(0x5A),0x04))
 end
