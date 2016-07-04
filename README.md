@@ -26,7 +26,7 @@ Connections
 <tr><td>D5</td><td>SCK</td></tr>
 <tr><td>D6</td><td>MISO</td></tr>
 <tr><td>D7</td><td>MOSI</td></tr>
-<tr><td>D8</td><td>NSS</td></tr>
+<tr><td>D0</td><td>NSS</td></tr>
 <tr><td>GND</td><td>GND</td></tr>
 <tr><td>3.3V</td><td>VCC</td></tr>
 </table>
@@ -61,6 +61,7 @@ It will only listen on a specific channel, but will send on whatever channel or 
 
 ## Revisions
 
++ 2016-07-04 changed SX1278 NSS pin to D0
 + 2016-07-03 refactor to use integer version of firmware in order to have more free resources
 + 2016-07-02 initial revision
 

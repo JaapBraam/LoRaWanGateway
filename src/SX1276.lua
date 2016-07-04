@@ -40,7 +40,7 @@ local M={
   txnb=0
 }
 
-local nss=8
+local nss=0
 
 local function read(addr)
   gpiowrite(nss, 0)
