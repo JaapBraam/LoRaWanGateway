@@ -123,7 +123,7 @@ end
 local function rxpk(pkg)
   local msg=header(0x00)..cjson.encode({rxpk={pkg}})
   -- fix '4\/5' -> '4/5'
-  msg=string.gsub(msg,"4\\","4")
+  msg=msg:gsub("\\/","/")
   -- fix floats in strings
   msg=msg:gsub('"(%d+)[.](%d+)"','%1.%2')
   router_client:send(msg)
@@ -134,7 +134,7 @@ end
 
 local function tx_ack(data)
   local msg=header(0x05,data:byte(2),data:byte(3))
-  -- translate freq (Mhz) float to int (Hz) 
+  -- translate freq (Mhz) float to int (Hz)
   local fix=data:sub(5):gsub('"freq":(%d+)[.](%d+),',function(d,f) return '"freq":'..(d*1000000+f*100000)..',' end)
   local json=cjson.decode(fix)
   local resp=radio.txpk(json.txpk)

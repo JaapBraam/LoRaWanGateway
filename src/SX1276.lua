@@ -337,8 +337,8 @@ function M.txpk(pkt)
   local bw=MC1[pkt.datr:sub(-5)]
   local cr=MC1[pkt.codr]
   local crc=0x00 -- crc disabled...
-  local iiq=band(read(0x33),0x40)
-  if pkt.ipol then iiq=bor(iiq,0x40) else iiq=band(iiq,0xBF)end
+  local iiq=0x27
+  if pkt.ipol then iiq=0x67 end
   local powe=pkt.powe
   local size=pkt.size
   local data=encoder.fromBase64(padBase64(pkt.data)):sub(1,size)
