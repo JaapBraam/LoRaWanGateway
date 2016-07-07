@@ -338,11 +338,11 @@ function M.txpk(pkt)
   local cr=MC1[pkt.codr]
   local crc=0x00 -- crc disabled...
   local iiq=0x27
-  if pkt.ipol then iiq=0x67 end
+  if pkt.ipol==true then iiq=0x40 end
   local powe=pkt.powe
   local size=pkt.size
   local data=encoder.fromBase64(padBase64(pkt.data)):sub(1,size)
-  local trig=(tmst-now())/1000-30
+  local trig=((tmst-now())/1000)-35
   if trig > 0 then
     tmr.alarm(TX_TIMER,trig,tmr.ALARM_SINGLE,function() transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data,size) end)
   else
