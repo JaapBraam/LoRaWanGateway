@@ -299,7 +299,7 @@ local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   end
   setOpMode(0x03)
   M.txnb=M.txnb+1
-  print("transmitPkt",tmst-t0,tmst-t1,tmst-t2,freq,sf,bw,cr,powe,#data)
+  print("transmitPkt",tmst-t0,tmst-t1,tmst-t2,freq,sf,bw,cr,iiq,powe,#data)
 end
 
 
@@ -327,11 +327,10 @@ function M.rxpk(pkg)
 end
 
 local TX_TIMER=0
+local TX_DELAY=1000 -- Send a bit later than commanded by the txpk. Works much better for OTAA, I don't know why...
 function M.txpk(pkt)
-  -- local INVERT_IQ=0x33
-
   --{"txpk":{"codr":"4/5","data":"YHBhYUoAAwABHOZxE2w","freq":869.525,"ipol":true,"modu":"LORA","powe":27,"rfch":0,"size":14,"tmst":190582123,"datr":"SF9BW125"}}
-  local tmst=pkt.tmst
+  local tmst=pkt.tmst+TX_DELAY
   local freq=pkt.freq
   local sf=MC2[pkt.datr:sub(1,-6)]
   local bw=MC1[pkt.datr:sub(-5)]
@@ -342,7 +341,7 @@ function M.txpk(pkt)
   local powe=pkt.powe
   local size=pkt.size
   local data=encoder.fromBase64(padBase64(pkt.data)):sub(1,size)
-  local trig=((tmst-now())/1000)-35
+  local trig=((tmst-now())/1000)-30
   if trig > 0 then
     tmr.alarm(TX_TIMER,trig,tmr.ALARM_SINGLE,function() transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data,size) end)
   else

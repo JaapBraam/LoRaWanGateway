@@ -43,6 +43,7 @@ else
 end
 
 -- settings
+GW_ROUTER="router.eu.thethings.network"
 GW_CH=0
 GW_SF="SF7"
 -- gateway location
