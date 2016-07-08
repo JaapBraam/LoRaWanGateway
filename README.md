@@ -55,7 +55,7 @@ Therefore you have to build NodeMCU firmware containing only the modules needed.
 
 The LoRaWanGateway is configured to listen on EU channel 0, SF7BW125
 
-Changing the configuration can be done in init.lua (channel, SF, location of gateway)
+Changing the configuration can be done in init.lua (router, channel, SF, location of gateway)
 
 It will only listen on a specific channel, but will send on whatever channel or datarate the router seems fit...
 
