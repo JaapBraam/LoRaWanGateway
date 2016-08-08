@@ -37,7 +37,8 @@ local bnot=bit.bnot
 local M={
   rxnb=0,
   rxok=0,
-  txnb=0
+  txnb=0,
+  rssiTreshold=0xB8
 }
 
 local nss=0
@@ -257,19 +258,6 @@ local function txBuffer(data)
   write(0x00,data)
 end
 
-local prevDump={}
-local function dump()
-  print("----------")
-  for r=0x01,0x039 do
-    local v=read(r)
-    local p=prevDump[r] or 0
-    print(string.format("reg %02X = %02X (%02X)",r,v,p))
-    prevDump[r]=v
-  end
-  print("----------")
-end
-
-
 local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   --  local IRQ_FLAGS=0x12
   --  local DIO_MAPPING_1=0x40
@@ -279,6 +267,8 @@ local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   --  local OPMODE_TX=0x03
 
   local t0=now()
+  write(0x01,0x00)
+  setOpMode(0x00)
   setOpMode(0x01)
   write(0x40,0x40) --DIO_MAPPING_1=0x40
   gpio.mode(M.dio0,gpio.INT)
@@ -300,6 +290,95 @@ local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   setOpMode(0x03)
   M.txnb=M.txnb+1
   print("transmitPkt",tmst-t0,tmst-t1,tmst-t2,freq,sf,bw,cr,iiq,powe,#data)
+end
+
+local state=0
+local stamp=0
+local cadSF=0
+
+local function dio1handler()
+  --  local IRQ_FLAGS=0x12
+  --  local DIO_MAPPING_1=0x40
+  
+  if state == 1 then -- CAD_DETECTED
+    write(0x01,0x86) -- RX_SINGLE
+    state=2
+    write(0x40,0x00) -- DIO0 RxDone, DIO1 RxTimeout
+  elseif state == 3 then -- RX_TIMEOUT
+    write(0x12,0xFF) -- clear interrupt flags
+    print("rx timeout",now()-stamp,cadSF/16)
+    M.scanner()
+  end
+end
+
+local function dio0handler()
+  --  local OP_MODE=0x01
+  --  local IRQ_FLAGS=0x12
+  --  local MODEM_CONFIG3=0x26
+  --  local IRQ_FLAGS1=0x3E
+  --  local DIO_MAPPING_1=0x40
+  --  local OPMODE_SLEEP=0x00
+  --  local OPMODE_CAD=0x07
+  --  local OPMODE_RX_SINGLE=0x06
+  --  local OPMODE_CAD=0x07
+
+  if state == 0 then -- state is RSSIDetect
+    write(0x01,0x00) -- set mode FSK Sleep
+    write(0x01,0x80) -- set mode LoRa Sleep
+    write(0x01,0x87) -- set mode LoRa CAD
+    state=1 -- CAD
+    write(0x40,0xA0) -- DIO0 CadDone, DIO1 CadDetected
+    write(0x3E,0xFF) -- clear interrupt flags
+  elseif state == 1 then -- state is CadDetect
+    if cadSF < 0xC0 then -- try next SF
+      cadSF=cadSF+0x10 -- next SF
+      write(0x1E,cadSF) -- set next SF
+      if cadSF==0xB0 then
+        write(0x26,0x0C) -- ModemConfig3: LowDataRateOptimize on
+      end
+      if cadSF==0xA0 then
+        write(0x1F,0x05) -- RegSymbolTimeoutLSB: SymbolTimeout 5
+      end
+      write(0x01,0x87) -- set mode LoRa CAD
+      write(0x12,0xFF) -- clear interrupt flags
+    else
+      write(0x12,0xFF) -- clear interrupt flags
+      print("cad timeout",now()-stamp)
+      M.scanner() -- restart scanner
+    end
+  elseif state == 2 then -- state is CadDetected
+    state=3
+    write(0x12,0xFF) -- clear interrupt flags
+  elseif state == 3 then -- state is RxDone
+    rxDone() -- handle message received
+    M.scanner() -- restart scanner
+  end
+  stamp=now()
+end
+
+
+local function detector()
+--  local RegOpMode=0x01
+--  local OPMODE_SLEEP=0x00
+--  local OPMODE_RX=0x05
+--  local DIO_MAPPING_1=0x40
+
+  write(0x01,0x00) -- set mode FSK sleep
+  setOpMode(0x00)  -- set mode LoRa sleep
+  write(0x39,0x34) -- syncword LoRaWan
+  setChannel(M.ch,M.sf) -- channel settings in LoRa mode
+
+  cadSF=M.sf+0x04 -- reset SF hopper
+
+  write(0x01,0x00) -- set mode FSK sleep
+  write(0x40,0x70) -- DIO0 RSSIDetected, DIO1 none
+  gpio.mode(M.dio0,gpio.INT)
+  gpio.trig(M.dio0,"up",dio0handler)
+  gpio.mode(M.dio1,gpio.INT)
+  gpio.trig(M.dio1,"up",dio1handler)
+  --start
+  state=0 -- RSSI detect
+  write(0x01,0x05) -- set mode FSK Rx
 end
 
 
@@ -365,8 +444,12 @@ local function sxInit()
   --  local PA_RAMP=0x0A
   --  local PA_DAC=0x5A
   --  local LNA_MAX_GAIN=0x23
-  --  local LNA_OFF_GAIN=0x00
-  --  local LNA_LOW_GAIN=0x20
+
+  --  local FSKRegRxConfig=0x0D
+  --  local FSKRegRssiConfig=0x0E
+  --  local FSKRegRssiThresh=0x10
+  --  local FSKRegRxBw=0x12
+  --  local FSKRegPacketConfig2=0x31
 
   local version = read(0x42)
   if (version ~= 0x12) then
@@ -380,6 +463,15 @@ local function sxInit()
   write(0x21,0x08)
   write(0x0A, bor(band(read(0x0A),0xF0),0x08)) --set PA ramp-up time 50 uSec
   write(0x5A,bor(read(0x5A),0x04))
+  -- setup RSSI detector
+  setOpMode(0x40)
+  write(0x0D,0x81)
+  write(0x0E,0x04)
+  write(0x10,M.rssiTreshold)
+  write(0x12,0x02)
+  write(0x31,0x00)
+  -- back to lora page
+  setOpMode(0x00)
 end
 
 local function init(dio0,dio1)
@@ -391,10 +483,10 @@ local function init(dio0,dio1)
   M.dio0=dio0
   M.dio1=dio1
   M.ch=GW_CH
-  M.sf=MC2[GW_SF]
+  M.sf=MC2["SF7"]
 
-  M.scanner=continuous
-  --M.scanner=manual
+  --M.scanner=continuous
+  M.scanner=detector
   --M.scanner=cad
 
   M.scanner()

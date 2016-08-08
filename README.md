@@ -4,7 +4,7 @@ A LoRaWan Gateway in LUA
 + Port the OneChannelGateway to NodeMCU/LUA (https://github.com/things4u/ESP-1ch-Gateway) - Done!
 + Add support for sending messages to nodes - Done!
 + Add support for OTAA - Done!
-+ Add support for receiving multiple SF's on a channel
++ Add support for receiving multiple SF's on a channel - Done!
 + Add support for more than one channel
 
 ## Why LUA?
@@ -53,14 +53,15 @@ Therefore you have to build NodeMCU firmware containing only the modules needed.
 + The LoRaWanGateway will start after first compiling all your sources
 
 
-The LoRaWanGateway is configured to listen on EU channel 0, SF7BW125
+The LoRaWanGateway is configured to listen on EU channel 0.
 
-Changing the configuration can be done in init.lua (channel, SF, location of gateway)
+Changing the configuration can be done in init.lua (channel, location of gateway, pin mappings for DIO0 and DIO1)
 
 It will only listen on a specific channel, but will send on whatever channel or datarate the router seems fit...
 
 ## Revisions
 
++ 2016-08-08 receive messages on all spreading factors
 + 2016-07-04 changed SX1278 NSS pin to D0
 + 2016-07-03 refactor to use integer version of firmware in order to have more free resources
 + 2016-07-02 initial revision

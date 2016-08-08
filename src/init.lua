@@ -45,7 +45,9 @@ end
 -- settings
 GW_ROUTER="router.eu.thethings.network"
 GW_CH=0
-GW_SF="SF7"
 -- gateway location
 GW_LAT="0.0"
 GW_LON="0.0"
+-- hardware setup
+GW_DIO0=1
+GW_DIO1=2

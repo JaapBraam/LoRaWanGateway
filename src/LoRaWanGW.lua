@@ -186,7 +186,7 @@ wifi.sta.eventMonReg(wifi.STA_GOTIP, function()
     connectRouter()
     GW_stat.lati=GW_LAT
     GW_stat.long=GW_LON
-    radio=require("SX1276")(1,2)
+    radio=require("SX1276")(GW_DIO0,GW_DIO1)
     radio.rxpk=rxpk
   end)
 end)
