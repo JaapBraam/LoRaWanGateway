@@ -57,10 +57,11 @@ The LoRaWanGateway is configured to listen on EU channel 0.
 
 Changing the configuration can be done in init.lua (channel, location of gateway, pin mappings for DIO0 and DIO1)
 
-It will only listen on a specific channel, but will send on whatever channel or datarate the router seems fit...
+It will listen to all spreading factors but only on one specific channel. It will send on whatever channel or datarate the router seems fit...
 
 ## Revisions
 
++ 2016-08-12 measure RSSI in Lora mode, speed up SPI bus, cpufreq 160Mhz
 + 2016-08-08 receive messages on all spreading factors
 + 2016-07-04 changed SX1278 NSS pin to D0
 + 2016-07-03 refactor to use integer version of firmware in order to have more free resources
