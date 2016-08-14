@@ -135,7 +135,7 @@ end
 local function tx_ack(data)
   local msg=header(0x05,data:byte(2),data:byte(3))
   -- translate freq (Mhz) float to int (Hz)
-  local fix=data:sub(5):gsub('"freq":(%d+)[.](%d+),',function(d,f) return '"freq":'..(d*1000000+f*100000)..',' end)
+  local fix=data:sub(5):gsub('"freq":(%d+)[.](%d+),',function(d,f) local h=f; while h*10 < 1000000 do h=h*10 end; return '"freq":'..(d*1000000+h)..',' end)
   local json=cjson.decode(fix)
   local resp=radio.txpk(json.txpk)
   GW_stat.dwnb=GW_stat.dwnb+1
