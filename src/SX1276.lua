@@ -39,93 +39,28 @@ local M={
   txnb=0
 }
 
-local nss=0
+--local nss=0
 
 local function read(addr)
-  gpiowrite(nss, 0)
+  gpiowrite(0, 0)
   spisend(1,band(addr,0x7F))
   local b = spirecv(1,1)
-  gpiowrite(nss, 1)
+  gpiowrite(0, 1)
   return string.byte(b)
 end
 
 local function readBuffer(addr,len)
-  gpiowrite(nss, 0)
+  gpiowrite(0, 0)
   spisend(1,band(addr,0x7F))
   local buf = spirecv(1,len)
-  gpiowrite(nss, 1)
+  gpiowrite(0, 1)
   return buf
 end
 
 local function write(addr,value)
-  gpiowrite(nss, 0)
+  gpiowrite(0, 0)
   spisend(1,bor(addr,0x80),value)
-  gpiowrite(nss, 1)
-end
-
-local function pktCRC()
-  --  local IRQ_FLAGS=0x12
-  --  local PayloadCrcError=0x20
-  --  local HOP_CHANNEL=0x1C
-
-  local irqflags = read(0x12)
-  if band(irqflags,0x20) == 0x20 then
-    write(0x12, 0x20)
-    return -1
-  else
-    local rhc = read(0x1C)
-    if band(rhc,0x40) == 0x40 then
-      return 1
-    else
-      return 0
-    end
-  end
-end
-
-local function pktChan()
-  --  local HOP_CHANNEL=0x1C
-  return band(read(0x1C),0x1F)
-end
-
-local function pktFreq()
-  -- local FRF_MSB=0x06
-  -- local FRF_MID=0x07
-  -- local FRF_LSB=0x08
-
-  --local frf=lshift(lshift(read(0x06),8)+read(0x07),8)+read(0x08)
-  --return (125*frf/2^11) -- in KHz
-  return (125000*read(0x08)/2^11)+(125000*read(0x07)/2^3)+(125000*read(0x06)*2^5)
-end
-
-local function pktLsnr()
-  -- local PKT_SNR_VALUE=0x19
-  local snr=read(0x19)
-  if band(snr,0x80) then
-    snr=-band(bnot(snr)+1,0xFF)
-  end
-  return snr/4
-end
-
-local function pktRssi()
-  -- local PKT_RSSI_VALUE=0x1A
-
-  local rssi=read(0x1A)
-  return -157+rssi
-end
-
-local function pktDatr()
-  -- local MODEM_CONFIG=0x1D
-  -- local MODEM_CONFIG2=0x1E
-
-  local mc1=read(0x1D)
-  local mc2=read(0x1E)
-  return getName(MC2,mc2,0xF0)..getName(MC1,mc1,0xF0)
-end
-
-local function pktCodr()
-  -- local MODEM_CONFIG=0x1D
-  local mc1=read(0x1D)
-  return getName(MC1,mc1,0x0E)
+  gpiowrite(0, 1)
 end
 
 local function pktData()
@@ -152,17 +87,45 @@ local function rxDone()
   -- message counter
   M.rxnb=M.rxnb+1
 
-  pkt.stat=pktCRC()
+  -- CRC
+  local irqflags = read(0x12)
+  if band(irqflags,0x20) == 0x20 then
+    write(0x12, 0x20)
+    pkt.stat=-1
+  else
+    local rhc = read(0x1C)
+    if band(rhc,0x40) == 0x40 then
+      pkt.stat= 1
+    else
+      pkt.stat= 0
+    end
+  end
+
   if pkt.stat ~= -1 then
-    pkt.chan=pktChan()
+    local hopch=read(0x1C)
+    pkt.chan=band(hopch,0x1F) --pktChan()
+
     pkt.rfch=0
     pkt.modu="LORA"
-    local freq=pktFreq() -- in Hz
+
+    local freq=(125000*read(0x08)/2^11)+(125000*read(0x07)/2^3)+(125000*read(0x06)*2^5) --pktFreq() -- in Hz
     pkt.freq=string.format("%0d.%06d",freq/1000000,freq%1000000)
-    pkt.rssi=pktRssi()
-    pkt.lsnr=pktLsnr()
-    pkt.datr=pktDatr()
-    pkt.codr=pktCodr()
+
+    local rssi=read(0x1A)
+    pkt.rssi=-157+rssi-- pktRssi()
+
+    local snr=read(0x19)
+    if band(snr,0x80) then
+      snr=-band(bnot(snr)+1,0xFF)
+    end
+    pkt.lsnr=snr/4 --pktLsnr()
+
+    local mc1=read(0x1D)
+    local mc2=read(0x1E)
+    pkt.datr=getName(MC2,mc2,0xF0)..getName(MC1,mc1,0xF0) -- pktDatr()
+
+    pkt.codr=getName(MC1,mc1,0x0E) -- pktCodr()
+
     local data=pktData()
     pkt.size=#data
     pkt.data=encoder.toBase64(data)
@@ -259,7 +222,7 @@ local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   --  local OPMODE_TX=0x03
 
   local t0=now()
-  write(0x01,0x80)
+  write(0x01,0x81)
   write(0x40,0x40) --DIO_MAPPING_1=0x40
   gpio.mode(M.dio0,gpio.INT)
   gpio.trig(M.dio0,"up",function()
@@ -285,9 +248,25 @@ end
 local state=0
 local stamp=0
 local cadSF=0
+local cadCh=0
 
 local maxRssi=0
 local minRssi=255
+
+local function hop()
+  if state == 0 then
+    write(0x01,0x01) -- Lora STANDBY
+    cadCh=(cadCh+1)%3
+    if cadCh == 0 then
+      setFreq(868100000)
+    elseif cadCh == 1 then
+      setFreq(868300000)
+    elseif cadCh == 2 then
+      setFreq(868500000)
+    end
+    write(0x01,0x87) -- set mode LoRa CAD
+  end
+end
 
 local function dio1handler()
   --  local IRQ_FLAGS=0x12
@@ -305,7 +284,7 @@ local function dio1handler()
     end
   elseif state == 2 then -- RX_TIMEOUT
     local rssi=read(0x1B)
-    print("rx timeout",now()-stamp,cadSF/16,rssi,"rssi",maxRssi,minRssi)
+    print("rx timeout",now()-stamp,cadSF/16,cadCh,rssi,"rssi",maxRssi,minRssi)
     M.scanner()
   end
 end
@@ -355,6 +334,8 @@ local function dio0handler()
     local rssi=read(0x1B)
     if rssi > 42 then
       state=1 -- CAD
+    else
+    --hop()
     end
     if rssi > maxRssi then
       maxRssi=rssi
@@ -387,7 +368,7 @@ local function detector()
   --  local OPMODE_RX=0x05
   --  local DIO_MAPPING_1=0x40
 
-  write(0x01,0x80)  -- set mode LoRa standby
+  write(0x01,0x81)  -- set mode LoRa standby
   write(0x39,0x34) -- syncword LoRaWan
   setChannel(M.ch,M.sf) -- channel settings in LoRa mode
 
@@ -405,6 +386,11 @@ local function detector()
   state=0 -- RSSI detect
   write(0x01,0x87) -- set mode LoRa CAD
   write(0x12,0xFF) -- clear interrupt flags
+  delay(256)
+  local rssi=read(0x1B)
+  if rssi > 42 then
+    state=1 -- CAD
+  end
 end
 
 function M.rxpk(pkg)
@@ -468,8 +454,8 @@ local function init(dio0,dio1)
   --
   node.setcpufreq(node.CPU160MHZ)
   -- setup SPI
-  spi.setup(1,spi.MASTER,spi.CPOL_LOW,spi.CPHA_LOW,spi.DATABITS_8,4)
-  gpio.mode(nss, gpio.OUTPUT)
+  spi.setup(1,spi.MASTER,spi.CPOL_LOW,spi.CPHA_LOW,spi.DATABITS_8,3)
+  gpio.mode(0, gpio.OUTPUT)
   -- init radio
   sxInit()
   -- setup handlers
