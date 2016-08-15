@@ -92,7 +92,6 @@ local bor=bit.bor
 local band=bit.band
 local bnot=bit.bnot
 local delay=tmr.delay
-local wdclr=tmr.wdclr
 
 local M={
   rxnb=0,
@@ -325,7 +324,6 @@ local function hop()
     write(0x01,0x87) -- set mode LoRa CAD
   end
 end
-
 
 local function dio1handler()
   --  local IRQ_FLAGS=0x12

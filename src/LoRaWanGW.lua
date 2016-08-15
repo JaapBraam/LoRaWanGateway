@@ -22,7 +22,16 @@
 --
 --Author: Jaap Braam
 
-require("utils")
+local function padBase64(s)
+  local p=4-(#s % 4)
+  return s..string.rep("=",p % 4)
+end
+
+local function gmtime(t,us)
+  local tm = rtctime.epoch2cal(t)
+  return string.format('%04d-%02d-%02dT%02d:%02d:%02d.%06dZ',tm["year"],tm["mon"],tm["day"],tm["hour"],tm["min"],tm["sec"],us)
+end
+
 
 -- communication with router!
 
