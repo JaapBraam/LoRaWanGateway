@@ -22,7 +22,67 @@
 --
 --Author: Jaap Braam
 
-require("SX1276_H")
+local function padBase64(s)
+  local p=4-(#s % 4)
+  return s..string.rep("=",p % 4)
+end
+
+local function gmtime(t,us)
+  local tm = rtctime.epoch2cal(t)
+  return string.format('%04d-%02d-%02dT%02d:%02d:%02d.%06dZ',tm["year"],tm["mon"],tm["day"],tm["hour"],tm["min"],tm["sec"],us)
+end
+
+local MC1={
+  BW125=0x70,
+  BW250=0x80,
+  BW500=0x90,
+  BW150=0x00
+}
+MC1["4/5"]=0x02
+MC1["4/6"]=0x04
+MC1["4/7"]=0x06
+MC1["4/8"]=0x08
+
+local MC2={
+  FSK=0x00,
+  SF6=0x60,
+  SF7=0x70,
+  SF8=0x80,
+  SF9=0x90,
+  SF10=0xA0,
+  SF11=0xB0,
+  SF12=0xC0
+}
+
+local function getName(table,value,mask)
+  for k,v in pairs(table) do
+    if bit.band(value,mask) == v then
+      return k
+    end
+  end
+  return "?"
+end
+
+-- channels
+local function chan(freq,modulation,bw)
+  return {
+    freq=freq,
+    modu=modulation,
+    bw=bw
+  }
+end
+
+local CHN={}
+CHN[0]=chan(868100000,"LoRa",MC1.BW125)
+CHN[1]=chan(868300000,"LoRa",MC1.BW125)
+CHN[2]=chan(868500000,"LoRa",MC1.BW125)
+CHN[3]=chan(867100000,"LoRa",MC1.BW125)
+CHN[4]=chan(867300000,"LoRa",MC1.BW125)
+CHN[5]=chan(867500000,"LoRa",MC1.BW125)
+CHN[6]=chan(867700000,"LoRa",MC1.BW125)
+CHN[7]=chan(867900000,"LoRa",MC1.BW125)
+CHN[8]=chan(868300000,"LoRa",MC1.BW250)
+CHN[9]=chan(868800000,"FSK" ,MC1.BW150)
 
 local now=tmr.now
 local gpiowrite=gpio.write
@@ -32,6 +92,7 @@ local bor=bit.bor
 local band=bit.band
 local bnot=bit.bnot
 local delay=tmr.delay
+local wdclr=tmr.wdclr
 
 local M={
   rxnb=0,
@@ -222,7 +283,8 @@ local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   --  local OPMODE_TX=0x03
 
   local t0=now()
-  write(0x01,0x81)
+  state=3 -- tx
+  write(0x01,0x80)
   write(0x40,0x40) --DIO_MAPPING_1=0x40
   gpio.mode(M.dio0,gpio.INT)
   gpio.trig(M.dio0,"up",function()
@@ -246,12 +308,8 @@ local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
 end
 
 local state=0
-local stamp=0
 local cadSF=0
 local cadCh=0
-
-local maxRssi=0
-local minRssi=255
 
 local function hop()
   if state == 0 then
@@ -267,6 +325,7 @@ local function hop()
     write(0x01,0x87) -- set mode LoRa CAD
   end
 end
+
 
 local function dio1handler()
   --  local IRQ_FLAGS=0x12
@@ -284,7 +343,7 @@ local function dio1handler()
     end
   elseif state == 2 then -- RX_TIMEOUT
     local rssi=read(0x1B)
-    print("rx timeout",now()-stamp,cadSF/16,cadCh,rssi,"rssi",maxRssi,minRssi)
+    print("rx timeout",cadSF/16,cadCh,"rssi",rssi)
     M.scanner()
   end
 end
@@ -313,18 +372,8 @@ local function dio0handler()
       local rssi=read(0x1B)
       if rssi < 40 then
         M.scanner()
-      else
-        if rssi > maxRssi then
-          maxRssi=rssi
-        end
-        if rssi < minRssi then
-          minRssi=rssi
-        end
       end
     else
-      write(0x12,0xFF) -- clear interrupt flags
-      --local rssi=read(0x1B)
-      --print("cad timeout",now()-stamp,cadSF/16,rssi,"rssi",maxRssi,minRssi)
       M.scanner() -- restart scanner
     end
   elseif state==0 then
@@ -337,30 +386,16 @@ local function dio0handler()
     else
     --hop()
     end
-    if rssi > maxRssi then
-      maxRssi=rssi
-    end
-    if rssi < minRssi then
-      minRssi=rssi
-    end
   elseif state==2 then
     local flags=read(0x12)
-    if band(flags,0x80)==0x80 then
-      -- RxTimeout
-      write(0x12,0xFF) -- clear interrupt flags
-      local rssi=read(0x1B)
-      print("rx timeout",now()-stamp,cadSF/16,rssi,"rssi",maxRssi,minRssi)
-      M.scanner()
-    elseif band(flags,0x40)==0x40 then
+    if band(flags,0x40)==0x40 then
       -- RxDone
       rxDone() -- handle message received
-      --print("rxDone",now()-stamp,"rssi",maxRssi,minRssi)
-      write(0x12,0xFF) -- clear interrupt flags
       M.scanner() -- restart scanner
     end
   end
-  stamp=now()
 end
+
 
 local function detector()
   --  local RegOpMode=0x01
@@ -383,8 +418,8 @@ local function detector()
   --start
   maxRssi=0
   minRssi=255
-  state=0 -- RSSI detect
   write(0x01,0x87) -- set mode LoRa CAD
+  state=0 -- RSSI detect
   write(0x12,0xFF) -- clear interrupt flags
   delay(256)
   local rssi=read(0x1B)

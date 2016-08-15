@@ -22,15 +22,7 @@
 --
 --Author: Jaap Braam
 
-if file.exists("utils.lua") then
-    node.compile("utils.lua")
-    file.remove("utils.lua")
-    node.restart()
-elseif file.exists("SX1276_H.lua") then
-    node.compile("SX1276_H.lua")
-    file.remove("SX1276_H.lua")
-    node.restart()
-elseif file.exists("SX1276.lua") then
+if file.exists("SX1276.lua") then
     node.compile("SX1276.lua")
     file.remove("SX1276.lua")
     node.restart()
