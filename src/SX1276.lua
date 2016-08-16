@@ -135,10 +135,11 @@ local function pktData()
   return readBuffer(0x00,count)
 end
 
+local tmst=0
 local function rxDone()
   --  local IRQ_FLAGS=0x12
   --  local RxDone=0x40
-  local tmst=now()
+  --local tmst=now()
   local pkt={}
   pkt.tmst=tmst
   pkt.time=gmtime(rtctime.get())
@@ -353,6 +354,7 @@ local function dio0handler()
   --  local DIO_MAPPING_1=0x40
   --  local OPMODE_CAD=0x07
 
+  tmst=now()
   -- CadDone
   if state==1 then
     if cadSF < 0xC0 then -- try next SF
