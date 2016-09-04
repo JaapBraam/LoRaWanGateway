@@ -170,7 +170,7 @@ local function rxDone()
     pkt.modu="LORA"
 
     local freq=(125000*read(0x08)/2^11)+(125000*read(0x07)/2^3)+(125000*read(0x06)*2^5) --pktFreq() -- in Hz
-    pkt.freq=string.format("%0d.%06d",freq/1000000,freq%1000000)
+    pkt.freq=string.format("%0d.%03d",freq/1000000,((freq+500)/1000)%1000)
 
     local rssi=read(0x1A)
     pkt.rssi=-157+rssi-- pktRssi()
