@@ -61,6 +61,7 @@ It will listen to all spreading factors but only on one specific channel. It wil
 
 ## Revisions
 
++ 2016-09-21 add GW_ALT and GW_NSS parameters to init.lua, fix stat message
 + 2016-08-12 measure RSSI in Lora mode, speed up SPI bus, cpufreq 160Mhz
 + 2016-08-08 receive messages on all spreading factors
 + 2016-07-04 changed SX1278 NSS pin to D0
