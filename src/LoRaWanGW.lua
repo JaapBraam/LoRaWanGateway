@@ -29,7 +29,7 @@ end
 
 local function gmtime(t,us)
   local tm = rtctime.epoch2cal(t)
-  return string.format('%04d-%02d-%02dT%02d:%02d:%02d.%06dZ',tm["year"],tm["mon"],tm["day"],tm["hour"],tm["min"],tm["sec"],us)
+  return string.format('%04d-%02d-%02d %02d:%02d:%02d GMT',tm["year"],tm["mon"],tm["day"],tm["hour"],tm["min"],tm["sec"])
 end
 
 
@@ -64,6 +64,8 @@ end
 
 local GW_stat={
   time=gmtime(rtctime.get()),
+  lati="0.0",
+  long="0.0",
   alti=0,
   rxnb=0,
   rxok=0,
@@ -71,9 +73,9 @@ local GW_stat={
   ackr=0, -- float!
   dwnb=0,
   txnb=0,
-  pfrm="ESP8266",
-  mail="",
-  desc="ESP8266 Gateway (Lua)"
+  --pfrm="ESP8266",
+  --mail="",
+  --desc="ESP8266 Gateway (Lua)"
 }
 
 -- statistics for ackr
@@ -193,8 +195,15 @@ wifi.sta.eventMonReg(wifi.STA_GOTIP, function()
     print(gmtime(rtctime.get()))
     math.randomseed(us)
     connectRouter()
-    GW_stat.lati=GW_LAT
-    GW_stat.long=GW_LON
+    if (GW_ALT) then
+      GW_stat.alti=GW_ALT
+    end
+    if (GW_LAT) then
+      GW_stat.lati=GW_LAT
+    end
+    if (GW_LON) then
+      GW_stat.long=GW_LON
+    end
     radio=require("SX1276")(GW_DIO0,GW_DIO1)
     radio.rxpk=rxpk
   end)

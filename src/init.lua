@@ -38,8 +38,10 @@ end
 GW_ROUTER="router.eu.thethings.network"
 GW_CH=0
 -- gateway location
+GW_ALT=0
 GW_LAT="0.0"
 GW_LON="0.0"
 -- hardware setup
+GW_NSS=0
 GW_DIO0=1
 GW_DIO1=2

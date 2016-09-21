@@ -92,6 +92,7 @@ local bor=bit.bor
 local band=bit.band
 local bnot=bit.bnot
 local delay=tmr.delay
+local byte=string.byte
 
 local M={
   rxnb=0,
@@ -99,28 +100,28 @@ local M={
   txnb=0
 }
 
---local nss=0
+local nss=0
 
 local function read(addr)
-  gpiowrite(0, 0)
-  spisend(1,band(addr,0x7F))
+  gpiowrite(nss, 0)
+  spisend(1,addr)
   local b = spirecv(1,1)
-  gpiowrite(0, 1)
-  return string.byte(b)
+  gpiowrite(nss, 1)
+  return byte(b)
 end
 
 local function readBuffer(addr,len)
-  gpiowrite(0, 0)
-  spisend(1,band(addr,0x7F))
+  gpiowrite(nss, 0)
+  spisend(1,addr)
   local buf = spirecv(1,len)
-  gpiowrite(0, 1)
+  gpiowrite(nss, 1)
   return buf
 end
 
 local function write(addr,value)
-  gpiowrite(0, 0)
-  spisend(1,bor(addr,0x80),value)
-  gpiowrite(0, 1)
+  gpiowrite(nss, 0)
+  spisend(1,addr+0x80,value)
+  gpiowrite(nss, 1)
 end
 
 local function pktData()
@@ -170,14 +171,14 @@ local function rxDone()
     pkt.modu="LORA"
 
     local freq=(125000*read(0x08)/2^11)+(125000*read(0x07)/2^3)+(125000*read(0x06)*2^5) --pktFreq() -- in Hz
-    pkt.freq=string.format("%0d.%06d",freq/1000000,freq%1000000)
+    pkt.freq=string.format("%0d.%03d",freq/1000000,((freq+500)/1000)%1000)
 
     local rssi=read(0x1A)
     pkt.rssi=-157+rssi-- pktRssi()
 
     local snr=read(0x19)
-    if band(snr,0x80) then
-      snr=-band(bnot(snr)+1,0xFF)
+    if snr > 127 then
+      snr=-(band(bnot(snr),0xFF)+1)
     end
     pkt.lsnr=snr/4 --pktLsnr()
 
@@ -312,17 +313,28 @@ local cadSF=0
 local cadCh=0
 
 local function hop()
-  if state == 0 then
-    write(0x01,0x01) -- Lora STANDBY
-    cadCh=(cadCh+1)%3
+  local rssi=read(0x1B)
+  if rssi < 50 then
+    write(0x01,0x81) -- Lora STANDBY
+    --cadCh=(cadCh+1)%3
     if cadCh == 0 then
-      setFreq(868100000)
+      --setFreq(868100000)
+      --write(0x06, 0xD9);
+      write(0x07, 0x06);
+      write(0x08, 0x66);
     elseif cadCh == 1 then
-      setFreq(868300000)
+      --setFreq(868300000)
+      --write(0x06, 0xD9);
+      write(0x07, 0x13);
+      write(0x08, 0x33);
     elseif cadCh == 2 then
-      setFreq(868500000)
+      --setFreq(868500000)
+      --write(0x06, 0xD9);
+      write(0x07, 0x20);
+      write(0x08, 0x00);
     end
     write(0x01,0x87) -- set mode LoRa CAD
+    write(0x40,0xA3) -- DIO0 CadDone, DIO1 None, DIO3 None
   end
 end
 
@@ -497,6 +509,9 @@ local function init(dio0,dio1)
   M.dio0=dio0
   M.dio1=dio1
 
+  if (GW_NSS) then
+    nss=GW_NSS
+  end
   M.ch=GW_CH
   M.sf=MC2["SF7"]
 
