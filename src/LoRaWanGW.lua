@@ -93,7 +93,7 @@ function stat()
   end
   local msg=cjson.encode({stat=GW_stat})
   -- fix floats in strings
-  msg=msg:gsub('"(%d+)[.](%d+)"','%1.%2')
+  msg=msg:gsub('"(%-*%d+)[.](%d+)"','%1.%2')
   radio.rxnb=0
   radio.rxok=0
   radio.txnb=0
