@@ -42,7 +42,7 @@ local radio
 
 local function getGW_id()
   s=string.gsub(wifi.sta.getmac(),":","")
-  s=string.sub(s,1,6).."FFFF"..string.sub(s,7)
+  s=string.sub(s,1,6).."F42F"..string.sub(s,7)
   s=string.upper(s)
   print("Gateway ID",s)
   GW_id=""
