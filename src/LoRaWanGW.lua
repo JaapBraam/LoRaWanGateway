@@ -37,6 +37,7 @@ end
 
 local GW_id="<UNKNOWN>"
 local router_client
+local router_ip
 local radio
 
 local function getGW_id()
@@ -115,13 +116,15 @@ local function start_scheduler(router)
   tmr.alarm(PUSH_TIMER,PUSH_INTERVAL,tmr.ALARM_AUTO,function()
     local msg=stat()
     --print("push",encoder.toHex(msg:sub(1,12)),"message",msg:sub(13),"length",msg:len())
-    router:send(msg)
+    --router:send(msg)
+    router:send(1700,router_ip,msg)
     upSent=upSent+1
   end)
   tmr.alarm(PULL_TIMER,PULL_INTERVAL,tmr.ALARM_AUTO,function()
     local msg=header(0x02)
     --print("pull",encoder.toHex(msg:sub(1,12)))
-    router:send(msg)
+    --router:send(msg)
+    router:send(1700,router_ip,msg)
     upSent=upSent+1
   end)
   tmr.alarm(SNTP_TIMER,SNTP_INTERVAL,tmr.ALARM_AUTO,function()
@@ -137,7 +140,8 @@ local function rxpk(pkg)
   msg=msg:gsub("\\/","/")
   -- fix floats in strings
   msg=msg:gsub('"(%d+)[.](%d+)"','%1.%2')
-  router_client:send(msg)
+  --router_client:send(msg)
+  router_client:send(1700,router_ip,msg)
   print("rxpk",encoder.toHex(msg:sub(1,12)),"message",msg:sub(13),"length",msg:len())
   upSent=upSent+1
   GW_stat.rxfw=GW_stat.rxfw+1
@@ -152,7 +156,8 @@ local function tx_ack(data)
   GW_stat.dwnb=GW_stat.dwnb+1
   print("txpk",data:sub(5))
   print("txpk_ack",resp)
-  router_client:send(msg..resp)
+  --router_client:send(msg..resp)
+  router_client:send(1700,router_ip,msg..resp)
 end
 
 local function receiver(router,data)
@@ -177,7 +182,8 @@ local function connectRouter()
   router_client:on("receive", receiver)
   router_client:dns(GW_ROUTER,function(sck,ip)
     print("router ip:",ip)
-    router_client:connect(1700,ip)
+    router_ip=ip
+    --router_client:connect(1700,ip)
     start_scheduler(router_client)
   end)
 end
