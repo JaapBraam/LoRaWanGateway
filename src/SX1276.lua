@@ -428,8 +428,6 @@ local function detector()
   write(0x40,0xA3) -- DIO0 CadDone, DIO1 None, DIO3 None
 
   --start
-  maxRssi=0
-  minRssi=255
   write(0x01,0x87) -- set mode LoRa CAD
   state=0 -- RSSI detect
   write(0x12,0xFF) -- clear interrupt flags

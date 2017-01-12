@@ -74,9 +74,9 @@ local GW_stat={
   ackr=0, -- float!
   dwnb=0,
   txnb=0,
-  --pfrm="ESP8266",
-  --mail="",
-  --desc="ESP8266 Gateway (Lua)"
+--pfrm="ESP8266",
+--mail="",
+--desc="ESP8266 Gateway (Lua)"
 }
 
 -- statistics for ackr
@@ -105,8 +105,6 @@ function stat()
   return header(0x00)..msg
 end
 
-local SNTP_TIMER=4
-local SNTP_INTERVAL=300*1000
 local PUSH_TIMER=5
 local PUSH_INTERVAL=30*1000
 local PULL_TIMER=6
@@ -127,11 +125,9 @@ local function start_scheduler(router)
     router:send(1700,router_ip,msg)
     upSent=upSent+1
   end)
-  tmr.alarm(SNTP_TIMER,SNTP_INTERVAL,tmr.ALARM_AUTO,function()
-    sntp.sync('nl.pool.ntp.org',function(s,us,server)
-      print("ntp synced using "..server)
-    end)
-  end)
+  sntp.sync('nl.pool.ntp.org',function(s,us,server)
+    print("ntp synced using "..server)
+  end,nil,1)
 end
 
 local function rxpk(pkg)
