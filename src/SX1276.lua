@@ -236,11 +236,12 @@ local function setRate(sf,bw,cr,crc,iiq,powe)
   local stl=0x08
   if (sf == 0xA0 or sf == 0xB0 or sf == 0xC0) then stl=0x05 end
 
-  local pw = powe
-  if pw >= 16 then pw = 15
-  elseif pw < 2 then pw = 2
+  local pac 
+  if powe > 17 then pac = 0x8F               -- 17dbm
+  elseif powe < -3  then pac = 0x20          -- -3dbm
+  elseif powe <= 12 then pac = 0x20+powe+3   -- -3dbm .. 12dbm
+  else pac = 0x80+powe-2                     -- 13dbm .. 16dbm          
   end
-  local pac=bor(0x80,band(pw,0x0f))
 
   write(0x09,pac)
   write(0x1D,mc1)
