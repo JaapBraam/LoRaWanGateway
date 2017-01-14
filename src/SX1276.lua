@@ -231,8 +231,9 @@ local function setRate(sf,bw,cr,crc,iiq,powe)
 
   local mc1=bor(bw,cr)
   local mc2=bor(sf,crc)
-  local mc3=0x04
-  if (sf == 0xB0 or sf == 0xC0) then mc3=0x0C end -- MC2.SF11=0xB0, MC2.SF12=0xC0
+  --local mc3=0x04
+  local mc3=0x00 -- no AGC
+  if (sf == 0xB0 or sf == 0xC0) then mc3=0x08 end -- MC2.SF11=0xB0, MC2.SF12=0xC0
   local stl=0x08
   if (sf == 0xA0 or sf == 0xB0 or sf == 0xC0) then stl=0x05 end
 
