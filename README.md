@@ -69,6 +69,7 @@ It will listen to all spreading factors but only on one specific channel. It wil
 
 ## Revisions
 
+* 2017-01-15 add firmware directory containing flasher and nodemcu firmware
 + 2017-01-08 change UDP send because latest firmware changed udpsocket.send method.
 + 2016-09-21 add GW_ALT and GW_NSS parameters to init.lua, fix stat message
 + 2016-08-12 measure RSSI in Lora mode, speed up SPI bus, cpufreq 160Mhz
