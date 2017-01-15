@@ -37,7 +37,9 @@ The LoRaWanGateway needs quite some RAM and processing power, so it it necessary
 Therefore you have to build NodeMCU firmware containing only the modules needed. The build I'm using can be found in the firmware directory, along with the nodemcu flasher application.
 
 + Use the firmware in the firmware directory
+
 OR
+
 + Get the latest NodeMCU firmware on http://nodemcu-build.com/index.php 
 	+ select the dev branch
 	+ select the following modules: bit,cjson,encoder,file,gpio,net,node,rtctime,sntp,spi,tmr,uart,wifi
