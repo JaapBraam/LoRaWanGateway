@@ -502,16 +502,16 @@ local function init(dio0,dio1)
   node.setcpufreq(node.CPU160MHZ)
   -- setup SPI
   spi.setup(1,spi.MASTER,spi.CPOL_LOW,spi.CPHA_LOW,spi.DATABITS_8,3)
-  gpio.mode(0, gpio.OUTPUT)
+  if (GW_NSS) then
+    nss=GW_NSS
+  end
+  gpio.mode(nss, gpio.OUTPUT)
   -- init radio
   sxInit()
   -- setup handlers
   M.dio0=dio0
   M.dio1=dio1
 
-  if (GW_NSS) then
-    nss=GW_NSS
-  end
   M.ch=GW_CH
   M.sf=MC2["SF7"]
 
