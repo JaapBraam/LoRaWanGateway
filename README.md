@@ -108,6 +108,7 @@ It will listen to all spreading factors but only on one specific channel. It wil
 ## Revisions
 
 * 2017-01-15 add documentation [from the TTN forum](https://www.thethingsnetwork.org/forum/t/single-channel-gateway/798/227) and [issue #10](https://github.com/JaapBraam/LoRaWanGateway/issues/10)
+* 2017-01-15 fix for initialization using GW_NSS parameter
 * 2017-01-15 add firmware directory containing flasher and nodemcu firmware
 + 2017-01-08 change UDP send because latest firmware changed udpsocket.send method.
 + 2016-09-21 add GW_ALT and GW_NSS parameters to init.lua, fix stat message
