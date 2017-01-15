@@ -1,0 +1,223 @@
+<?xml version="1.0"?>
+<DataChest>
+  <Data name="ComboBoxFlashBaudrate.Text">
+    <Type>String</Type>
+    <Value>230400</Value>
+  </Data>
+  <Data name="ComboBoxFlashSize.ItemIndex">
+    <Type>Integer</Type>
+    <Value>4</Value>
+  </Data>
+  <Data name="ComboBoxFlashSpeed.ItemIndex">
+    <Type>Integer</Type>
+    <Value>0</Value>
+  </Data>
+  <Data name="ComboBoxSPIMode.ItemIndex">
+    <Type>Integer</Type>
+    <Value>1</Value>
+  </Data>
+  <Data name="FrameConfigLine1.Checked">
+    <Type>Boolean</Type>
+    <Value>True</Value>
+  </Data>
+  <Data name="FrameConfigLine1.FilePath">
+    <Type>String</Type>
+    <Value>.\nodemcu-dev-13-modules-2017-01-08-22-16-52-integer.bin</Value>
+  </Data>
+  <Data name="FrameConfigLine1.Offset">
+    <Type>String</Type>
+    <Value>0x00000</Value>
+  </Data>
+  <Data name="FrameConfigLine2.Checked">
+    <Type>Boolean</Type>
+    <Value>True</Value>
+  </Data>
+  <Data name="FrameConfigLine2.FilePath">
+    <Type>String</Type>
+    <Value>.\esp_init_data_default.bin</Value>
+  </Data>
+  <Data name="FrameConfigLine2.Offset">
+    <Type>String</Type>
+    <Value>0x3FC000</Value>
+  </Data>
+  <Data name="FrameConfigLine3.Checked">
+    <Type>Boolean</Type>
+    <Value>False</Value>
+  </Data>
+  <Data name="FrameConfigLine3.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine3.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine4.Checked">
+    <Type>Boolean</Type>
+    <Value>False</Value>
+  </Data>
+  <Data name="FrameConfigLine4.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine4.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine5.Checked">
+    <Type>Boolean</Type>
+    <Value>False</Value>
+  </Data>
+  <Data name="FrameConfigLine6.Checked">
+    <Type>Boolean</Type>
+    <Value>False</Value>
+  </Data>
+  <Data name="FrameConfigLine7.Checked">
+    <Type>Boolean</Type>
+    <Value>False</Value>
+  </Data>
+  <Data name="FrameConfigLine5.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine6.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine7.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine5.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine6.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine7.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine5.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine6.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine7.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine5.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine6.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine7.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine6.Checked">
+    <Type>Boolean</Type>
+    <Value>False</Value>
+  </Data>
+  <Data name="FrameConfigLine7.Checked">
+    <Type>Boolean</Type>
+    <Value>False</Value>
+  </Data>
+  <Data name="FrameConfigLine5.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine7.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine5.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine6.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine7.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine5.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine5.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine6.Checked">
+    <Type>Boolean</Type>
+    <Value>False</Value>
+  </Data>
+  <Data name="FrameConfigLine7.Checked">
+    <Type>Boolean</Type>
+    <Value>False</Value>
+  </Data>
+  <Data name="FrameConfigLine5.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine6.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine5.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine6.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine7.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine5.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine7.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine5.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine7.Checked">
+    <Type>Boolean</Type>
+    <Value>False</Value>
+  </Data>
+  <Data name="FrameConfigLine6.FilePath">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine7.Offset">
+    <Type>String</Type>
+    <Value/>
+  </Data>
+  <Data name="FrameConfigLine6.Checked">
+    <Type>Boolean</Type>
+    <Value>False</Value>
+  </Data>
+  <Publisher>
+    <Info>NodeMCU Team. http://www.nodemcu.com</Info>
+    <Version>1.0</Version>
+  </Publisher>
+</DataChest>

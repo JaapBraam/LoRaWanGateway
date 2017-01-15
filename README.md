@@ -34,15 +34,23 @@ Connections
 ## How to run
 
 The LoRaWanGateway needs quite some RAM and processing power, so it it necessary to flash firmware that uses as little resources as possible. 
-Therefore you have to build NodeMCU firmware containing only the modules needed.
+Therefore you have to build NodeMCU firmware containing only the modules needed. The build I'm using can be found in the firmware directory, along with the nodemcu flasher application.
 
-+ Get the NodeMCU firmware on http://nodemcu-build.com/index.php 
++ Use the firmware in the firmware directory
+OR
++ Get the latest NodeMCU firmware on http://nodemcu-build.com/index.php 
 	+ select the dev branch
 	+ select the following modules: bit,cjson,encoder,file,gpio,net,node,rtctime,sntp,spi,tmr,uart,wifi
+
 + Flash the integer version on your ESP8266
+	+ connect your ESP8266 to a serial port
+	+ start ESP8266Flasher.exe in the firmware directory
+	+ choose the correct serial port
+	+ push the Flash button
+	
 + Format ESP8266 filesystem
 + Register your wifi network
-	+ In the lua shell run 
+	+ in the lua shell run 
 		+ wifi.setmode(wifi.STATION)
 		+ wifi.sta.config("your SSID","your key")
 		+ wifi.sta.autoconnect(1)
