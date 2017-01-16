@@ -6,7 +6,7 @@ A LoRaWan Gateway in Lua, listening to all spreading factors on one specific cha
 + Add support for sending messages to nodes - Done!
 + Add support for OTAA - Done!
 + Add support for receiving multiple SF's on a channel - Done!
-+ Add support for more than one channel
++ Add support for more than one channel (won't work :-( )
 
 ## Why Lua?
 Lua is an event driven language, which is a good match for a gateway: a gateway has to respond to incoming messages from nodes and routers.
@@ -90,7 +90,7 @@ The LoRaWanGateway is configured to listen for all spreadingsfactors on EU chann
 The LoRaWanGateway can be run in two modes
 + Listen to all SF's, signal detection by RSSI
 + Listen to a single SF, lora signal detection
-When listening to a single SF, the range of your gateway will increase a lot because messages below the noise floor will be received to.
+When listening to a single SF, the range of your gateway will increase a lot because messages below the noise floor will be received too.
 
 Changing the configuration can be done in `init.lua`.
 <table>
@@ -121,10 +121,11 @@ To use the US915 band, change `SX1276.lua` to read:
 	CHN[9]=chan(904100000,"FSK" ,MC1.BW150)
 
 
-It will listen to all spreading factors but only on one specific channel. It will send on whatever channel or datarate the router seems fit...
+It will listen to only one specific channel. It will send on whatever channel or datarate the router seems fit...
 
 ## Revisions
 
+* 2017-01-16 support for listening on a single SF, drastically increasing range
 * 2017-01-15 add documentation [from the TTN forum](https://www.thethingsnetwork.org/forum/t/single-channel-gateway/798/227) and [issue #10](https://github.com/JaapBraam/LoRaWanGateway/issues/10)
 * 2017-01-15 fix for initialization using GW_NSS parameter
 * 2017-01-15 add firmware directory containing flasher and nodemcu firmware
