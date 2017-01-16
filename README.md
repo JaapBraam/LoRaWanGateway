@@ -84,9 +84,27 @@ OR
 + The LoRaWanGateway will start after first compiling all your sources
 
 
-The LoRaWanGateway is configured to listen on EU channel 0.
+## Configuration
+The LoRaWanGateway is configured to listen for all spreadingsfactors on EU channel 0.
 
-Changing the configuration can be done in `init.lua` (channel, location of gateway, pin mappings for DIO0, DIO1 and SSN).
+The LoRaWanGateway can be run in two modes
++ Listen to all SF's, signal detection by RSSI
++ Listen to a single SF, lora signal detection
+When listening to a single SF, the range of your gateway will increase a lot because messages below the noise floor will be received to.
+
+Changing the configuration can be done in `init.lua`.
+<table>
+<tr><th>Parameter</th><th>Description</th><th>Default</th></tr>
+<tr><td>GW_ROUTER</td><td>Dns name of the router to connect</td><td>router.eu.thethings.network</td></tr>
+<tr><td>GW_CH</td><td>Channel to listen to</td><td>0</td></tr>
+<tr><td>GW_SF</td><td>SF to listen to</td><td>N/A - listen to all SF's</td></tr>
+<tr><td>GW_ALT</td><td>Altitude of your gateway location</td><td>0</td></tr>
+<tr><td>GW_LAT</td><td>Latitude of your gateway location</td><td>"0.0"</td></tr>
+<tr><td>GW_LON</td><td>Longitude of your gateway location</td><td>"0.0"</td></tr>
+<tr><td>GW_NSS</td><td>NSS pin number</td><td>0</td></tr>
+<tr><td>GW_DIO0</td><td>DIO0 pin number</td><td>1</td></tr>
+<tr><td>GW_DIO1</td><td>DIO1 pin number</td><td>2</td></tr>
+</table>
 
 To use the US915 band, change `SX1276.lua` to read:
 

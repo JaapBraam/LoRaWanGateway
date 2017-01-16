@@ -37,6 +37,7 @@ end
 -- settings
 GW_ROUTER="router.eu.thethings.network"
 GW_CH=0
+--GW_SF=SF12 -- Only listen on this SF
 -- gateway location
 GW_ALT=0
 GW_LAT="0.0"

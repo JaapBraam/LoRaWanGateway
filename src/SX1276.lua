@@ -411,7 +411,7 @@ local function dio0handler()
 end
 
 
-local function detector()
+local function allSf()
   --  local RegOpMode=0x01
   --  local OPMODE_SLEEP=0x00
   --  local OPMODE_RX=0x05
@@ -439,6 +439,21 @@ local function detector()
     state=1 -- CAD
   end
 end
+
+local function singleSf()
+  write(0x01,0x81)  -- set mode LoRa standby
+  write(0x39,0x34) -- syncword LoRaWan
+  setChannel(M.ch,M.sf) -- channel settings in LoRa mode
+  gpio.mode(M.dio0,gpio.INT)
+  gpio.trig(M.dio0,"up",function()
+    tmst=now()
+    rxDone()
+    write(0x12,0xFF) -- clear interrupt flags
+  end)
+  write(0x40,0x03) -- DIO0 RxDone, DIO1 RxTimeout, DIO3 None
+  write(0x01,0x85)  -- set mode LoRa rxContinuous
+end
+
 
 function M.rxpk(pkg)
   print(cjson.encode(pkg))
@@ -513,9 +528,15 @@ local function init(dio0,dio1)
   M.dio1=dio1
 
   M.ch=GW_CH
-  M.sf=MC2["SF7"]
-
-  M.scanner=detector
+  if (GW_SF) then
+    M.sf=MC2[GW_SF]
+    M.scanner=singleSf
+    print("start singleSF detector on",GW_SF)
+  else
+    M.sf=MC2["SF7"]
+    M.scanner=allSf
+    print("start allSF detector")
+  end
 
   M.scanner()
 

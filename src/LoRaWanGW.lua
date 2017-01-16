@@ -74,9 +74,9 @@ local GW_stat={
   ackr=0, -- float!
   dwnb=0,
   txnb=0,
---pfrm="ESP8266",
+  pfrm="ESP8266",
 --mail="",
---desc="ESP8266 Gateway (Lua)"
+  desc="ESP8266 Gateway (Lua)"
 }
 
 -- statistics for ackr
