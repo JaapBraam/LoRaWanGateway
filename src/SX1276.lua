@@ -22,13 +22,32 @@
 --
 --Author: Jaap Braam
 
+local now=tmr.now
+local gpiowrite=gpio.write
+local spisend=spi.send
+local spirecv=spi.recv
+local bor=bit.bor
+local band=bit.band
+local bnot=bit.bnot
+local delay=tmr.delay
+local byte=string.byte
+local rtcepoch2cal=rtctime.epoch2cal
+local rtcget=rtctime.get
+
 local function padBase64(s)
   local p=4-(#s % 4)
   return s..string.rep("=",p % 4)
 end
 
-local function gmtime(t,us)
-  local tm = rtctime.epoch2cal(t)
+local function gmtime(tmst)
+  local t,us=rtcget()
+  local diff=now()-tmst
+  us=us-diff
+  if us < 0 then
+    us=us+1000000
+    t=t-1
+  end
+  local tm = rtcepoch2cal(t)
   return string.format('%04d-%02d-%02dT%02d:%02d:%02d.%06dZ',tm["year"],tm["mon"],tm["day"],tm["hour"],tm["min"],tm["sec"],us)
 end
 
@@ -84,16 +103,6 @@ CHN[7]=chan(867900000,"LoRa",MC1.BW125)
 CHN[8]=chan(868300000,"LoRa",MC1.BW250)
 CHN[9]=chan(868800000,"FSK" ,MC1.BW150)
 
-local now=tmr.now
-local gpiowrite=gpio.write
-local spisend=spi.send
-local spirecv=spi.recv
-local bor=bit.bor
-local band=bit.band
-local bnot=bit.bnot
-local delay=tmr.delay
-local byte=string.byte
-
 local M={
   rxnb=0,
   rxok=0,
@@ -143,7 +152,7 @@ local function rxDone()
   --local tmst=now()
   local pkt={}
   pkt.tmst=tmst
-  pkt.time=gmtime(rtctime.get())
+  pkt.time=gmtime(tmst)
   -- clear rxDone
   write(0x12, 0x40)
   -- message counter

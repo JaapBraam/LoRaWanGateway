@@ -125,6 +125,7 @@ It will listen to only one specific channel. It will send on whatever channel or
 
 ## Revisions
 
+* 2017-01-26 more accurate time in rxpk message
 * 2017-01-16 support for listening on a single SF, drastically increasing range
 * 2017-01-15 add documentation [from the TTN forum](https://www.thethingsnetwork.org/forum/t/single-channel-gateway/798/227) and [issue #10](https://github.com/JaapBraam/LoRaWanGateway/issues/10)
 * 2017-01-15 fix for initialization using GW_NSS parameter
