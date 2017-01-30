@@ -94,7 +94,7 @@ The LoRaWanGateway can be run in two modes
 When listening to a single SF, the range of your gateway will increase a lot because messages below the noise floor will be received too.
 
 Changing the configuration can be done from the LUA shell using the new CONFIG object.
-Values can be changed using CONFIG.<parameter>=<value> i.e. CONFIG.GW_FREQ=902300000 for listening to channel 0 on the US915 band.
+Values can be changed using CONFIG.PARAMETER=VALUE i.e. CONFIG.GW_FREQ=902300000 for listening to channel 0 on the US915 band.
 CONFIG.print() shows the current configuration, CONFIG.save() saves the current configuration.
 <table>
 <tr><th>Parameter</th><th>Description</th><th>Default</th></tr>
