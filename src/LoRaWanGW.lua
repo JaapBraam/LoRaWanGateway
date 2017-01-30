@@ -214,6 +214,9 @@ wifi.sta.eventMonReg(wifi.STA_GOTIP, function()
     local bw=CONFIG["GW_BW"]
     radio=require("SX1276")(nss,dio0,dio1,freq,sf,bw)
     radio.rxpk=rxpk
+  end,function()
+    print("sntp failed... restarting")
+    node.restart()
   end)
 end)
 

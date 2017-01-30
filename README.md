@@ -94,7 +94,7 @@ The LoRaWanGateway can be run in two modes
 When listening to a single SF, the range of your gateway will increase a lot because messages below the noise floor will be received too.
 
 Changing the configuration can be done from the LUA shell using the new CONFIG object.
-Values can be changed using CONFIG.PARAMETER=VALUE i.e. CONFIG.GW_FREQ=902300000 for listening to channel 0 on the US915 band.
+Values can be changed using CONFIG.*PARAMETER*=*VALUE* i.e. CONFIG.GW_FREQ=902300000 for listening to channel 0 on the US915 band.
 CONFIG.print() shows the current configuration, CONFIG.save() saves the current configuration.
 <table>
 <tr><th>Parameter</th><th>Description</th><th>Default</th></tr>
@@ -115,7 +115,7 @@ The gateway will listen to only one specific channel. It will send on whatever c
 
 ## Remote access using telnet
 
-You can connect to your gateway using a telnet client. If you connect to <GW_HOSTNAME>:23 you will get access to the LUA shell of your gateway.
+You can connect to your gateway using a telnet client. If you connect to *GW_HOSTNAME*:23 you will get access to the LUA shell of your gateway.
 From this shell you can monitor your gateway, and execute lua commands like node.restart() and =node.heap().
 
 ## Revisions
