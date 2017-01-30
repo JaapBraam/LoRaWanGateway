@@ -30,19 +30,11 @@ elseif file.exists("LoRaWanGW.lua") then
     node.compile("LoRaWanGW.lua")
     file.remove("LoRaWanGW.lua")
     node.restart()
+elseif file.exists("Config.lua") then
+    node.compile("Config.lua")
+    file.remove("Config.lua")
+    node.restart()
 else
+   require("Config")
    require("LoRaWanGW")
 end
-
--- settings
-GW_ROUTER="router.eu.thethings.network"
-GW_CH=0
---GW_SF=SF12 -- Only listen on this SF
--- gateway location
-GW_ALT=0
-GW_LAT="0.0"
-GW_LON="0.0"
--- hardware setup
-GW_NSS=0
-GW_DIO0=1
-GW_DIO1=2

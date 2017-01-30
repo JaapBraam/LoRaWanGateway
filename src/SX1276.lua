@@ -82,55 +82,40 @@ local function getName(table,value,mask)
   return "?"
 end
 
--- channels
-local function chan(freq,modulation,bw)
-  return {
-    freq=freq,
-    modu=modulation,
-    bw=bw
-  }
-end
-
-local CHN={}
-CHN[0]=chan(868100000,"LoRa",MC1.BW125)
-CHN[1]=chan(868300000,"LoRa",MC1.BW125)
-CHN[2]=chan(868500000,"LoRa",MC1.BW125)
-CHN[3]=chan(867100000,"LoRa",MC1.BW125)
-CHN[4]=chan(867300000,"LoRa",MC1.BW125)
-CHN[5]=chan(867500000,"LoRa",MC1.BW125)
-CHN[6]=chan(867700000,"LoRa",MC1.BW125)
-CHN[7]=chan(867900000,"LoRa",MC1.BW125)
-CHN[8]=chan(868300000,"LoRa",MC1.BW250)
-CHN[9]=chan(868800000,"FSK" ,MC1.BW150)
-
 local M={
   rxnb=0,
   rxok=0,
   txnb=0
 }
 
-local nss=0
+local _nss=0
+local _dio0=1
+local _dio1=2
+local _freq=868100000
+local _sf=MC2.SF7
+local _bw=MC1.BW125
+local _scanner=function() print("no scanner active") end
 
 local function read(addr)
-  gpiowrite(nss, 0)
+  gpiowrite(_nss, 0)
   spisend(1,addr)
   local b = spirecv(1,1)
-  gpiowrite(nss, 1)
+  gpiowrite(_nss, 1)
   return byte(b)
 end
 
 local function readBuffer(addr,len)
-  gpiowrite(nss, 0)
+  gpiowrite(_nss, 0)
   spisend(1,addr)
   local buf = spirecv(1,len)
-  gpiowrite(nss, 1)
+  gpiowrite(_nss, 1)
   return buf
 end
 
 local function write(addr,value)
-  gpiowrite(nss, 0)
+  gpiowrite(_nss, 0)
   spisend(1,addr+0x80,value)
-  gpiowrite(nss, 1)
+  gpiowrite(_nss, 1)
 end
 
 local function pktData()
@@ -176,7 +161,7 @@ local function rxDone()
     local hopch=read(0x1C)
     pkt.chan=band(hopch,0x1F) --pktChan()
 
-    pkt.rfch=0
+    pkt.rfch=1
     pkt.modu="LORA"
 
     local freq=(125000*read(0x08)/2^11)+(125000*read(0x07)/2^3)+(125000*read(0x06)*2^5) --pktFreq() -- in Hz
@@ -262,15 +247,14 @@ local function setRate(sf,bw,cr,crc,iiq,powe)
 end
 
 
-local function setChannel(ch,sf)
+local function setChannel(freq,sf)
   --  local HOP_PERIOD=0x24
   --  local FIFO_ADDR_PTR=0x0D
   --  local FIFO_RX_BASE_AD=0x0F
   --  local CR4_5=0x02
   --  local CRC_ON=0x04
-
-  setFreq(CHN[ch].freq)
-  setRate(sf,CHN[ch].bw,0x02,0x04,0x27,14) -- CR4/5=0x02, CRC_ON=0x04
+  setFreq(freq)
+  setRate(sf,_bw,0x02,0x04,0x27,14) -- CR4/5=0x02, CRC_ON=0x04
   write(0x24,0x00)
   write(0x0D,read(0x0F))
 end
@@ -286,6 +270,9 @@ local function txBuffer(data)
   write(0x00,data)
 end
 
+local state=0
+local cadSF=0
+
 local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   --  local IRQ_FLAGS=0x12
   --  local DIO_MAPPING_1=0x40
@@ -298,12 +285,12 @@ local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   state=3 -- tx
   write(0x01,0x80)
   write(0x40,0x40) --DIO_MAPPING_1=0x40
-  gpio.mode(M.dio0,gpio.INT)
-  gpio.trig(M.dio0,"up",function()
+  gpio.mode(_dio0,gpio.INT)
+  gpio.trig(_dio0,"up",function()
     -- clear TxDone
     write(0x12, 0xFF)
     --print("TxDone")
-    M.scanner()
+    _scanner()
   end)
   setFreq(freq)
   setRate(sf,bw,cr,crc,iiq,powe)
@@ -319,36 +306,6 @@ local function transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data)
   print("transmitPkt",tmst-t0,tmst-t1,tmst-t2,freq,sf,bw,cr,iiq,powe,#data)
 end
 
-local state=0
-local cadSF=0
-local cadCh=0
-
-local function hop()
-  local rssi=read(0x1B)
-  if rssi < 50 then
-    write(0x01,0x81) -- Lora STANDBY
-    --cadCh=(cadCh+1)%3
-    if cadCh == 0 then
-      --setFreq(868100000)
-      --write(0x06, 0xD9);
-      write(0x07, 0x06);
-      write(0x08, 0x66);
-    elseif cadCh == 1 then
-      --setFreq(868300000)
-      --write(0x06, 0xD9);
-      write(0x07, 0x13);
-      write(0x08, 0x33);
-    elseif cadCh == 2 then
-      --setFreq(868500000)
-      --write(0x06, 0xD9);
-      write(0x07, 0x20);
-      write(0x08, 0x00);
-    end
-    write(0x01,0x87) -- set mode LoRa CAD
-    write(0x40,0xA3) -- DIO0 CadDone, DIO1 None, DIO3 None
-  end
-end
-
 local function dio1handler()
   --  local IRQ_FLAGS=0x12
   --  local DIO_MAPPING_1=0x40
@@ -361,12 +318,12 @@ local function dio1handler()
     delay(256)
     local rssi=read(0x1B)
     if rssi < 40 then
-      M.scanner()
+      _scanner()
     end
   elseif state == 2 then -- RX_TIMEOUT
     local rssi=read(0x1B)
-    print("rx timeout",cadSF/16,cadCh,"rssi",rssi)
-    M.scanner()
+    print("rx timeout",cadSF/16,"rssi",rssi)
+    _scanner()
   end
 end
 
@@ -394,10 +351,10 @@ local function dio0handler()
       delay(256)
       local rssi=read(0x1B)
       if rssi < 40 then
-        M.scanner()
+        _scanner()
       end
     else
-      M.scanner() -- restart scanner
+      _scanner() -- restart scanner
     end
   elseif state==0 then
     write(0x01,0x87) -- set mode LoRa CAD
@@ -414,7 +371,7 @@ local function dio0handler()
     if band(flags,0x40)==0x40 then
       -- RxDone
       rxDone() -- handle message received
-      M.scanner() -- restart scanner
+      _scanner() -- restart scanner
     end
   end
 end
@@ -428,14 +385,14 @@ local function allSf()
 
   write(0x01,0x81)  -- set mode LoRa standby
   write(0x39,0x34) -- syncword LoRaWan
-  setChannel(M.ch,M.sf) -- channel settings in LoRa mode
+  setChannel(_freq,_sf) -- channel settings in LoRa mode
 
-  cadSF=M.sf+0x04 -- reset SF hopper
+  cadSF=_sf+0x04 -- reset SF hopper
 
-  gpio.mode(M.dio0,gpio.INT)
-  gpio.trig(M.dio0,"up",dio0handler)
-  gpio.mode(M.dio1,gpio.INT)
-  gpio.trig(M.dio1,"up",dio1handler)
+  gpio.mode(_dio0,gpio.INT)
+  gpio.trig(_dio0,"up",dio0handler)
+  gpio.mode(_dio1,gpio.INT)
+  gpio.trig(_dio1,"up",dio1handler)
   write(0x40,0xA3) -- DIO0 CadDone, DIO1 None, DIO3 None
 
   --start
@@ -452,9 +409,9 @@ end
 local function singleSf()
   write(0x01,0x81)  -- set mode LoRa standby
   write(0x39,0x34) -- syncword LoRaWan
-  setChannel(M.ch,M.sf) -- channel settings in LoRa mode
-  gpio.mode(M.dio0,gpio.INT)
-  gpio.trig(M.dio0,"up",function()
+  setChannel(_freq,_sf) -- channel settings in LoRa mode
+  gpio.mode(_dio0,gpio.INT)
+  gpio.trig(_dio0,"up",function()
     tmst=now()
     rxDone()
     write(0x12,0xFF) -- clear interrupt flags
@@ -521,33 +478,32 @@ local function sxInit()
   write(0x37,0x0A) -- detection threshold
 end
 
-local function init(dio0,dio1)
+local function init(nss,dio0,dio1,freq,sf,bw)
   --
   node.setcpufreq(node.CPU160MHZ)
   -- setup SPI
   spi.setup(1,spi.MASTER,spi.CPOL_LOW,spi.CPHA_LOW,spi.DATABITS_8,3)
-  if (GW_NSS) then
-    nss=GW_NSS
-  end
-  gpio.mode(nss, gpio.OUTPUT)
+  _nss=nss
+  gpio.mode(_nss, gpio.OUTPUT)
   -- init radio
   sxInit()
   -- setup handlers
-  M.dio0=dio0
-  M.dio1=dio1
+  _dio0=dio0
+  _dio1=dio1
 
-  M.ch=GW_CH
-  if (GW_SF) then
-    M.sf=MC2[GW_SF]
-    M.scanner=singleSf
-    print("start singleSF detector on",GW_SF)
-  else
-    M.sf=MC2["SF7"]
-    M.scanner=allSf
+  _freq=freq
+  _bw=MC1[bw]
+  if (sf=="ALL") then
+    _sf=MC2["SF7"]
+    _scanner=allSf
     print("start allSF detector")
+  else
+    _sf=MC2[sf]
+    _scanner=singleSf
+    print("start singleSF detector on",sf)
   end
 
-  M.scanner()
+  _scanner()
 
   return M
 end

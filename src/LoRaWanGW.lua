@@ -176,7 +176,7 @@ end
 local function connectRouter()
   router_client= net.createConnection(net.UDP)
   router_client:on("receive", receiver)
-  router_client:dns(GW_ROUTER,function(sck,ip)
+  router_client:dns(CONFIG["GW_ROUTER"],function(sck,ip)
     print("router ip:",ip)
     router_ip=ip
     --router_client:connect(1700,ip)
@@ -197,19 +197,26 @@ wifi.sta.eventMonReg(wifi.STA_GOTIP, function()
     print(gmtime(rtctime.get()))
     math.randomseed(us)
     connectRouter()
-    if (GW_ALT) then
-      GW_stat.alti=GW_ALT
+    if (CONFIG["GW_ALT"]) then
+      GW_stat.alti=CONFIG["GW_ALT"]
     end
-    if (GW_LAT) then
-      GW_stat.lati=GW_LAT
+    if (CONFIG["GW_LAT"]) then
+      GW_stat.lati=CONFIG["GW_LAT"]
     end
-    if (GW_LON) then
-      GW_stat.long=GW_LON
+    if (CONFIG["GW_LON"]) then
+      GW_stat.long=CONFIG["GW_LON"]
     end
-    radio=require("SX1276")(GW_DIO0,GW_DIO1)
+    local nss=CONFIG["GW_NSS"]
+    local dio0=CONFIG["GW_DIO0"]
+    local dio1=CONFIG["GW_DIO1"]
+    local freq=CONFIG["GW_FREQ"]
+    local sf=CONFIG["GW_SF"]
+    local bw=CONFIG["GW_BW"]
+    radio=require("SX1276")(nss,dio0,dio1,freq,sf,bw)
     radio.rxpk=rxpk
   end)
 end)
 
 -- startup
+wifi.sta.sethostname(CONFIG['GW_HOSTNAME'])
 wifi.sta.eventMonStart()

@@ -7,6 +7,7 @@ A LoRaWan Gateway in Lua, listening to all spreading factors on one specific cha
 + Add support for OTAA - Done!
 + Add support for receiving multiple SF's on a channel - Done!
 + Add support for more than one channel (won't work :-( )
++ Add support for remote access - Done!
 
 ## Why Lua?
 Lua is an event driven language, which is a good match for a gateway: a gateway has to respond to incoming messages from nodes and routers.
@@ -85,19 +86,23 @@ OR
 
 
 ## Configuration
-The LoRaWanGateway is configured to listen for all spreadingsfactors on EU channel 0.
+The LoRaWanGateway is configured to listen for all spreadingsfactors on EU channel 0 (868.1 Mhz).
 
 The LoRaWanGateway can be run in two modes
 + Listen to all SF's, signal detection by RSSI
 + Listen to a single SF, lora signal detection
 When listening to a single SF, the range of your gateway will increase a lot because messages below the noise floor will be received too.
 
-Changing the configuration can be done in `init.lua`.
+Changing the configuration can be done from the LUA shell using the new CONFIG object.
+Values can be changed using CONFIG.<parameter>=<value> i.e. CONFIG.GW_FREQ=902300000 for listening to channel 0 on the US915 band.
+CONFIG.print() shows the current configuration, CONFIG.save() saves the current configuration.
 <table>
 <tr><th>Parameter</th><th>Description</th><th>Default</th></tr>
+<tr><td>GW_HOSTNAME</td><td>Hostname for telnet server</td><td>lorawangw</td></tr>
 <tr><td>GW_ROUTER</td><td>Dns name of the router to connect</td><td>router.eu.thethings.network</td></tr>
-<tr><td>GW_CH</td><td>Channel to listen to</td><td>0</td></tr>
-<tr><td>GW_SF</td><td>SF to listen to</td><td>N/A - listen to all SF's</td></tr>
+<tr><td>GW_FREQ</td><td>Frequency (in Hz) to listen to</td><td>868100000</td></tr>
+<tr><td>GW_BW</td><td>BW to listen to</td><td>"BW125"</td></tr>
+<tr><td>GW_SF</td><td>SF to listen to</td><td>ALL - listen to all SF's</td></tr>
 <tr><td>GW_ALT</td><td>Altitude of your gateway location</td><td>0</td></tr>
 <tr><td>GW_LAT</td><td>Latitude of your gateway location</td><td>"0.0"</td></tr>
 <tr><td>GW_LON</td><td>Longitude of your gateway location</td><td>"0.0"</td></tr>
@@ -106,25 +111,16 @@ Changing the configuration can be done in `init.lua`.
 <tr><td>GW_DIO1</td><td>DIO1 pin number</td><td>2</td></tr>
 </table>
 
-To use the US915 band, change `SX1276.lua` to read:
+The gateway will listen to only one specific channel. It will send on whatever channel or datarate the router seems fit...
 
-	local CHN={}
-	CHN[0]=chan(902300000,"LoRa",MC1.BW125)
-	CHN[1]=chan(902500000,"LoRa",MC1.BW125)
-	CHN[2]=chan(902700000,"LoRa",MC1.BW125)
-	CHN[3]=chan(902900000,"LoRa",MC1.BW125)
-	CHN[4]=chan(903100000,"LoRa",MC1.BW125)
-	CHN[5]=chan(903300000,"LoRa",MC1.BW125)
-	CHN[6]=chan(903500000,"LoRa",MC1.BW125)
-	CHN[7]=chan(903700000,"LoRa",MC1.BW125)
-	CHN[8]=chan(903900000,"LoRa",MC1.BW250)
-	CHN[9]=chan(904100000,"FSK" ,MC1.BW150)
+## Remote access using telnet
 
-
-It will listen to only one specific channel. It will send on whatever channel or datarate the router seems fit...
+You can connect to your gateway using a telnet client. If you connect to <GW_HOSTNAME>:23 you will get access to the LUA shell of your gateway.
+From this shell you can monitor your gateway, and execute lua commands like node.restart() and =node.heap().
 
 ## Revisions
 
+* 2017-01-30 changed configuration:added CONFIG object, telnet support, refactor to use local variables
 * 2017-01-26 more accurate time in rxpk message
 * 2017-01-16 support for listening on a single SF, drastically increasing range
 * 2017-01-15 add documentation [from the TTN forum](https://www.thethingsnetwork.org/forum/t/single-channel-gateway/798/227) and [issue #10](https://github.com/JaapBraam/LoRaWanGateway/issues/10)
