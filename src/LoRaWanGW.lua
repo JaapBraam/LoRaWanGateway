@@ -41,7 +41,7 @@ local router_ip
 local radio
 
 local function getGW_id()
-  s=string.gsub(wifi.sta.getmac(),":","")
+  local s=string.gsub(wifi.sta.getmac(),":","")
   s=string.sub(s,1,6).."F42F"..string.sub(s,7)
   s=string.upper(s)
   print("Gateway ID",s)
@@ -63,6 +63,19 @@ local function header(pkgType,r1,r2)
   ) .. GW_id
 end
 
+local STATS={
+  start=0,
+  rxnb=0,
+  rxok=0,
+  rxto=0,
+  rxfw=0,
+  dwnb=0,
+  txnb=0,
+  upSent=0,
+  upAcks=0
+}
+
+
 local GW_stat={
   time=gmtime(rtctime.get()),
   lati="0.0",
@@ -83,7 +96,27 @@ local GW_stat={
 local upSent=0 -- upstream messages sent
 local upAcks=0 -- upstream messages acked
 
-function stat()
+function statistics()
+  local t,us=rtctime.get()
+  local tm = rtctime.epoch2cal(t-STATS.start)
+  local ackr=1000
+  if (STATS.upSent+upSent) > 0 then
+    ackr=1000*(STATS.upAcks+upAcks)/(STATS.upSent+upSent)
+  end
+  print("Statistics")
+  print("\tUptime         ",string.format('%d days, %d hours, %d minutes, %d seconds',tm["yday"]-1,tm["hour"],tm["min"],tm["sec"]))
+  print("\tMemory free    ",string.format('%d bytes',node.heap()))
+  print("\tRx packets     ",STATS.rxnb+radio.rxnb)
+  print("\tRx packets OK  ",STATS.rxok+radio.rxok)
+  print("\tRx timeouts    ",STATS.rxto+radio.rxto)
+  print("\tRx forwarded   ",STATS.rxfw+GW_stat.rxfw)
+  print("\tTx packets     ",STATS.dwnb+GW_stat.dwnb)
+  print("\tTx packets sent",STATS.txnb+radio.txnb)
+  print("\tAck ratio      ",string.format("%0d.%0d%% (%d/%d)",ackr/10,ackr%10,STATS.upAcks+upAcks,STATS.upSent+upSent))
+end
+
+
+local function stat()
   GW_stat.time=gmtime(rtctime.get())
   GW_stat.rxnb=radio.rxnb
   GW_stat.rxok=radio.rxok
@@ -95,8 +128,20 @@ function stat()
   local msg=cjson.encode({stat=GW_stat})
   -- fix floats in strings
   msg=msg:gsub('"(%-*%d+)[.](%d+)"','%1.%2')
+  -- update statistics since start
+  STATS.rxnb=STATS.rxnb+GW_stat.rxnb
+  STATS.rxok=STATS.rxok+GW_stat.rxok
+  STATS.rxto=STATS.rxto+radio.rxto
+  STATS.rxfw=STATS.rxfw+GW_stat.rxfw
+  STATS.txnb=STATS.txnb+GW_stat.txnb
+  STATS.upSent=STATS.upSent+upSent
+  STATS.upAcks=STATS.upAcks+upAcks
+  STATS.dwnb=STATS.dwnb+GW_stat.dwnb
+  STATS.txnb=STATS.txnb+GW_stat.txnb
+  -- clear
   radio.rxnb=0
   radio.rxok=0
+  radio.rxto=0
   radio.txnb=0
   upSent=0
   upAcks=0
@@ -194,8 +239,10 @@ wifi.sta.eventMonReg(wifi.STA_GOTIP, function()
   -- sync time
   sntp.sync('nl.pool.ntp.org',function(s,us,server)
     print("ntp synced using "..server)
-    print(gmtime(rtctime.get()))
+    local t,us=rtctime.get()
+    print(gmtime(t,us))
     math.randomseed(us)
+    STATS.start=t
     connectRouter()
     if (CONFIG["GW_ALT"]) then
       GW_stat.alti=CONFIG["GW_ALT"]

@@ -85,6 +85,7 @@ end
 local M={
   rxnb=0,
   rxok=0,
+  rxto=0,
   txnb=0
 }
 
@@ -323,6 +324,7 @@ local function dio1handler()
   elseif state == 2 then -- RX_TIMEOUT
     local rssi=read(0x1B)
     print("rx timeout",cadSF/16,"rssi",rssi)
+    M.rxto=M.rxto+1
     _scanner()
   end
 end
