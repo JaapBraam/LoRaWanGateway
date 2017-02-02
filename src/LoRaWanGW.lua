@@ -150,20 +150,17 @@ local function stat()
   return header(0x00)..msg
 end
 
-local PUSH_TIMER=5
-local PUSH_INTERVAL=30*1000
-local PULL_TIMER=6
-local PULL_INTERVAL=5*1000
-
+local pushTimer=tmr.create()
+local pullTimer=tmr.create()
 local function start_scheduler(router)
-  tmr.alarm(PUSH_TIMER,PUSH_INTERVAL,tmr.ALARM_AUTO,function()
+  pushTimer:alarm(30*1000,tmr.ALARM_AUTO,function()
     local msg=stat()
     --print("push",encoder.toHex(msg:sub(1,12)),"message",msg:sub(13),"length",msg:len())
     --router:send(msg)
     router:send(1700,router_ip,msg)
     upSent=upSent+1
   end)
-  tmr.alarm(PULL_TIMER,PULL_INTERVAL,tmr.ALARM_AUTO,function()
+  pullTimer:alarm(5*1000,tmr.ALARM_AUTO,function()
     local msg=header(0x02)
     --print("pull",encoder.toHex(msg:sub(1,12)))
     --router:send(msg)

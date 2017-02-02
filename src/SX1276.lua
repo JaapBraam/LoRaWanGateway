@@ -427,6 +427,7 @@ function M.rxpk(pkg)
   print(cjson.encode(pkg))
 end
 
+local txTimer=tmr.create()
 function M.txpk(pkt)
   --{"txpk":{"codr":"4/5","data":"YHBhYUoAAwABHOZxE2w","freq":869.525,"ipol":true,"modu":"LORA","powe":27,"rfch":0,"size":14,"tmst":190582123,"datr":"SF9BW125"}}
   local tmst=pkt.tmst+1000 -- Send a bit later than commanded by the txpk. Works much better for OTAA, I don't know why...
@@ -442,7 +443,7 @@ function M.txpk(pkt)
   local data=encoder.fromBase64(padBase64(pkt.data)):sub(1,size)
   local trig=((tmst-now())/1000)-20
   if trig > 0 then
-    tmr.alarm(0,trig,tmr.ALARM_SINGLE,function() transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data,size) end)
+    txTimer:alarm(trig,tmr.ALARM_SINGLE,function() transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data,size) end)
   else
     transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data,size)
   end
