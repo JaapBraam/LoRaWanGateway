@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <DataChest>
   <Data name="ComboBoxFlashBaudrate.Text">
     <Type>String</Type>
@@ -18,7 +18,7 @@
   </Data>
   <Data name="FrameConfigLine1.Checked">
     <Type>Boolean</Type>
-    <Value>False</Value>
+    <Value>True</Value>
   </Data>
   <Data name="FrameConfigLine1.FilePath">
     <Type>String</Type>
@@ -30,7 +30,7 @@
   </Data>
   <Data name="FrameConfigLine2.Checked">
     <Type>Boolean</Type>
-    <Value>False</Value>
+    <Value>True</Value>
   </Data>
   <Data name="FrameConfigLine2.FilePath">
     <Type>String</Type>
@@ -46,23 +46,23 @@
   </Data>
   <Data name="FrameConfigLine3.FilePath">
     <Type>String</Type>
-    <Value>C:\Users\jaap_000\Work\LoRaWan\scrapbook\ttn-otaa-wemos\ttn-otaa-wemos.ino.d1_mini.bin</Value>
+    <Value/>
   </Data>
   <Data name="FrameConfigLine3.Offset">
     <Type>String</Type>
-    <Value>0x00000</Value>
+    <Value/>
   </Data>
   <Data name="FrameConfigLine4.Checked">
     <Type>Boolean</Type>
-    <Value>True</Value>
+    <Value>False</Value>
   </Data>
   <Data name="FrameConfigLine4.FilePath">
     <Type>String</Type>
-    <Value>C:\Users\jaap_000\Work\LoRaWan\scrapbook\ttn-otaa-wemos\ttn-otaa-wemos.ino.d1_mini-ok.bin</Value>
+    <Value/>
   </Data>
   <Data name="FrameConfigLine4.Offset">
     <Type>String</Type>
-    <Value>0x00000</Value>
+    <Value/>
   </Data>
   <Data name="FrameConfigLine5.Checked">
     <Type>Boolean</Type>
