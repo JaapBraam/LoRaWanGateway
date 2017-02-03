@@ -441,7 +441,9 @@ function M.txpk(pkt)
   local powe=pkt.powe
   local size=pkt.size
   local data=encoder.fromBase64(padBase64(pkt.data)):sub(1,size)
-  local trig=((tmst-now())/1000)-20
+  -- trigger transmitPkt 30ms before the message has to be sent. 
+  -- a large margin is necessary because the ESP's timing is 'not so precise'
+  local trig=((tmst-now())/1000)-30
   if trig > 0 then
     txTimer:alarm(trig,tmr.ALARM_SINGLE,function() transmitPkt(tmst,freq,sf,bw,cr,crc,iiq,powe,data,size) end)
   else

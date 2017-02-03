@@ -150,6 +150,7 @@ You can view statistics by entering statistics() in the LUA shell or in your tel
 
 ## Revisions
 
+* 2017-02-03 increase margin on transmit timing (see [issue #16](https://github.com/JaapBraam/LoRaWanGateway/issues/16))
 * 2017-01-31 added statistics, formatted CONFIG.print()
 * 2017-01-30 changed configuration:added CONFIG object, telnet support, refactor to use local variables
 * 2017-01-26 more accurate time in rxpk message
