@@ -124,6 +124,7 @@ CONFIG.save() saves the current configuration.
 <tr><th>Parameter</th><th>Description</th><th>Default</th></tr>
 <tr><td>GW_HOSTNAME</td><td>Hostname for telnet server</td><td>"lorawangw"</td></tr>
 <tr><td>GW_ROUTER</td><td>Dns name of the router to connect</td><td>"router.eu.thethings.network"</td></tr>
+<tr><td>GW_PORT</td><td>Port number of the router to connect</td><td>1700</td></tr>
 <tr><td>GW_FREQ</td><td>Frequency (in Hz) to listen to</td><td>868100000</td></tr>
 <tr><td>GW_BW</td><td>BW to listen to</td><td>"BW125"</td></tr>
 <tr><td>GW_SF</td><td>SF to listen to ("SF7".."SF12"|"ALL")</td><td>"ALL" (listen to all SF's)</td></tr>
@@ -150,6 +151,8 @@ You can view statistics by entering statistics() in the LUA shell or in your tel
 
 ## Revisions
 
+* 2017-04-18 make router portnumber configurable (thanx to @dlarue [issue #25](https://github.com/JaapBraam/LoRaWanGateway/issues/25) )
+* 2017-04-18 fix bug parsing frequency in txpk packets
 * 2017-03-21 fix message size limit (thanx to @joscha [issue #22](https://github.com/JaapBraam/LoRaWanGateway/issues/22) )
 * 2017-02-03 increase margin on transmit timing (see [issue #16](https://github.com/JaapBraam/LoRaWanGateway/issues/16))
 * 2017-01-31 added statistics, formatted CONFIG.print()
