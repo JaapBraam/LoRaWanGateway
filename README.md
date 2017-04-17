@@ -152,7 +152,7 @@ You can view statistics by entering statistics() in the LUA shell or in your tel
 ## Revisions
 
 * 2017-04-18 make router portnumber configurable (thanx to @dlarue [issue #25](https://github.com/JaapBraam/LoRaWanGateway/issues/25) )
-* 2017-04-18 fix bug parsing frequency in txpk packets
+* 2017-04-18 fix bug parsing frequency in txpk packets (thanx to @dlarue [issue #26](https://github.com/JaapBraam/LoRaWanGateway/issues/26))
 * 2017-03-21 fix message size limit (thanx to @joscha [issue #22](https://github.com/JaapBraam/LoRaWanGateway/issues/22) )
 * 2017-02-03 increase margin on transmit timing (see [issue #16](https://github.com/JaapBraam/LoRaWanGateway/issues/16))
 * 2017-01-31 added statistics, formatted CONFIG.print()
