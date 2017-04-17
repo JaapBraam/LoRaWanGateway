@@ -2,7 +2,7 @@ CONFIG = {}
 -- defaults
 CONFIG["GW_HOSTNAME"]="lorawangw"
 CONFIG["GW_ROUTER"]="router.eu.thethings.network"
-CONFIG["GW_PORT"]="1700"
+CONFIG["GW_PORT"]=1700
 CONFIG["GW_FREQ"]=868100000
 CONFIG["GW_BW"]="BW125"
 CONFIG["GW_SF"]="ALL"
@@ -44,6 +44,10 @@ if file.exists('config.json') then
   local json=file.read()
   file.close()
   CONFIG=cjson.decode(json)
+  if (not CONFIG["GW_PORT"]) then
+    CONFIG["GW_PORT"]=1700
+    saveConfig()
+  end
 else
   print("no config found, using default values")
 end
