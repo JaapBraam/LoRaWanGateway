@@ -157,14 +157,14 @@ local function start_scheduler(router)
     local msg=stat()
     --print("push",encoder.toHex(msg:sub(1,12)),"message",msg:sub(13),"length",msg:len())
     --router:send(msg)
-    router:send(1700,router_ip,msg)
+    router:send(CONFIG["GW_PORT"],router_ip,msg)
     upSent=upSent+1
   end)
   pullTimer:alarm(5*1000,tmr.ALARM_AUTO,function()
     local msg=header(0x02)
     --print("pull",encoder.toHex(msg:sub(1,12)))
     --router:send(msg)
-    router:send(1700,router_ip,msg)
+    router:send(CONFIG["GW_PORT"],router_ip,msg)
     upSent=upSent+1
   end)
   sntp.sync('nl.pool.ntp.org',function(s,us,server)
@@ -179,7 +179,7 @@ local function rxpk(pkg)
   -- fix floats in strings
   msg=msg:gsub('"(%d+)[.](%d+)"','%1.%2')
   --router_client:send(msg)
-  router_client:send(1700,router_ip,msg)
+  router_client:send(CONFIG["GW_PORT"],router_ip,msg)
   print("rxpk",encoder.toHex(msg:sub(1,12)),"message",msg:sub(13),"length",msg:len())
   upSent=upSent+1
   GW_stat.rxfw=GW_stat.rxfw+1
@@ -188,14 +188,14 @@ end
 local function tx_ack(data)
   local msg=header(0x05,data:byte(2),data:byte(3))
   -- translate freq (Mhz) float to int (Hz)
-  local fix=data:sub(5):gsub('"freq":(%d+)[.](%d+),',function(d,f) local h=f; while h*10 < 1000000 do h=h*10 end; return '"freq":'..(d*1000000+h)..',' end)
+  local fix=data:sub(5):gsub('"freq":(%d+)[.](%d+)',function(d,f) local h=f; while h*10 < 1000000 do h=h*10 end; return '"freq":'..(d*1000000+h) end)
   local json=cjson.decode(fix)
   local resp=radio.txpk(json.txpk)
   GW_stat.dwnb=GW_stat.dwnb+1
   print("txpk",data:sub(5))
   print("txpk_ack",resp)
   --router_client:send(msg..resp)
-  router_client:send(1700,router_ip,msg..resp)
+  router_client:send(CONFIG["GW_PORT"],router_ip,msg..resp)
 end
 
 local function receiver(router,data)
@@ -221,7 +221,7 @@ local function connectRouter()
   router_client:dns(CONFIG["GW_ROUTER"],function(sck,ip)
     print("router ip:",ip)
     router_ip=ip
-    --router_client:connect(1700,ip)
+    -- router_client:connect(CONFIG["GW_PORT"],ip)
     start_scheduler(router_client)
   end)
 end
