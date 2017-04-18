@@ -79,7 +79,7 @@ needed. The build I'm using can be found in the firmware directory, along with t
 OR
 
 + Get the latest NodeMCU firmware on https://nodemcu-build.com/
-	+ select the dev branch
+	+ select the master branch
 	+ select the following modules: bit, CJSON, encoder, file, GPIO, net, node, RTC time, SNTP, SPI, timer, UART, WiFi
 
 + Flash the integer version on your ESP8266
@@ -151,6 +151,7 @@ You can view statistics by entering statistics() in the LUA shell or in your tel
 
 ## Revisions
 
+* 2017-04-18 updated documentation (build master firmware) and updated packeged firmware (thanx to @xenek [issue #30](https://github.com/JaapBraam/LoRaWanGateway/issues/30) )
 * 2017-04-18 make router portnumber configurable (thanx to @dlarue [issue #25](https://github.com/JaapBraam/LoRaWanGateway/issues/25) )
 * 2017-04-18 fix bug parsing frequency in txpk packets (thanx to @dlarue [issue #26](https://github.com/JaapBraam/LoRaWanGateway/issues/26))
 * 2017-03-21 fix message size limit (thanx to @joscha [issue #22](https://github.com/JaapBraam/LoRaWanGateway/issues/22) )
