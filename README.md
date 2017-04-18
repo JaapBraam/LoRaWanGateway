@@ -123,6 +123,7 @@ CONFIG.save() saves the current configuration.
 <table>
 <tr><th>Parameter</th><th>Description</th><th>Default</th></tr>
 <tr><td>GW_HOSTNAME</td><td>Hostname for telnet server</td><td>"lorawangw"</td></tr>
+<tr><td>GW_NTP_SERVER</td><td>Dns name of the ntp server to connect</td><td>"nl.pool.ntp.org"</td></tr>
 <tr><td>GW_ROUTER</td><td>Dns name of the router to connect</td><td>"router.eu.thethings.network"</td></tr>
 <tr><td>GW_PORT</td><td>Port number of the router to connect</td><td>1700</td></tr>
 <tr><td>GW_FREQ</td><td>Frequency (in Hz) to listen to</td><td>868100000</td></tr>
@@ -151,6 +152,7 @@ You can view statistics by entering statistics() in the LUA shell or in your tel
 
 ## Revisions
 
+* 2017-04-18 add GW_NTP_SERVER
 * 2017-04-18 updated documentation (build master firmware) and updated packeged firmware (thanx to @xenek [issue #30](https://github.com/JaapBraam/LoRaWanGateway/issues/30) )
 * 2017-04-18 make router portnumber configurable (thanx to @dlarue [issue #25](https://github.com/JaapBraam/LoRaWanGateway/issues/25) )
 * 2017-04-18 fix bug parsing frequency in txpk packets (thanx to @dlarue [issue #26](https://github.com/JaapBraam/LoRaWanGateway/issues/26))

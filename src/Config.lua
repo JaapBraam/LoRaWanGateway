@@ -2,6 +2,7 @@ CONFIG = {}
 -- defaults
 CONFIG["GW_HOSTNAME"]="lorawangw"
 CONFIG["GW_ROUTER"]="router.eu.thethings.network"
+CONFIG["GW_NTP_SERVER"]="nl.pool.ntp.org"
 CONFIG["GW_PORT"]=1700
 CONFIG["GW_FREQ"]=868100000
 CONFIG["GW_BW"]="BW125"
@@ -16,6 +17,7 @@ CONFIG["GW_DIO1"]=2
 local function printConfig()
   print("Configuration")
   print("\tGW_HOSTNAME",'"'..CONFIG["GW_HOSTNAME"]..'"')
+  print("\tGW_NTP_SERVER",'"'..CONFIG["GW_NTP_SERVER"]..'"')
   print("\tGW_ROUTER  ",'"'..CONFIG["GW_ROUTER"]..'"')
   print("\tGW_PORT    ",'"'..CONFIG["GW_PORT"]..'"')
   print("\tGW_FREQ    ",CONFIG["GW_FREQ"])
@@ -46,6 +48,10 @@ if file.exists('config.json') then
   CONFIG=cjson.decode(json)
   if (not CONFIG["GW_PORT"]) then
     CONFIG["GW_PORT"]=1700
+    saveConfig()
+  end
+  if (not CONFIG["GW_NTP_SERVER"]) then
+    CONFIG["GW_NTP_SERVER"]="nl.pool.ntp.org"
     saveConfig()
   end
 else
