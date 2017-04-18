@@ -35,6 +35,9 @@ elseif file.exists("Config.lua") then
     file.remove("Config.lua")
     node.restart()
 else
+   if not _G.cjson then
+      _G.cjson=sjson -- use cjson to be backwards compatible with master branch
+   end
    require("Config")
    require("LoRaWanGW")
 end

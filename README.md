@@ -152,8 +152,9 @@ You can view statistics by entering statistics() in the LUA shell or in your tel
 
 ## Revisions
 
+* 2017-04-19 restored compatability with nodemcu dev branch, rewrote deprications (thanx to @xenek [issue #30](https://github.com/JaapBraam/LoRaWanGateway/issues/30) )
 * 2017-04-18 add GW_NTP_SERVER [issue #29](https://github.com/JaapBraam/LoRaWanGateway/issues/29)
-* 2017-04-18 updated documentation (build master firmware) and updated packeged firmware (thanx to @xenek [issue #30](https://github.com/JaapBraam/LoRaWanGateway/issues/30) )
+* 2017-04-18 updated documentation (build master firmware) and updated packeged firmware
 * 2017-04-18 make router portnumber configurable (thanx to @dlarue [issue #25](https://github.com/JaapBraam/LoRaWanGateway/issues/25) )
 * 2017-04-18 fix bug parsing frequency in txpk packets (thanx to @dlarue [issue #26](https://github.com/JaapBraam/LoRaWanGateway/issues/26))
 * 2017-03-21 fix message size limit (thanx to @joscha [issue #22](https://github.com/JaapBraam/LoRaWanGateway/issues/22) )

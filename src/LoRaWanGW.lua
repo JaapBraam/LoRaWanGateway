@@ -190,6 +190,7 @@ local function tx_ack(data)
   -- translate freq (Mhz) float to int (Hz)
   local fix=data:sub(5):gsub('"freq":(%d+)[.](%d+)',function(d,f) local h=f; while h*10 < 1000000 do h=h*10 end; return '"freq":'..(d*1000000+h) end)
   local json=cjson.decode(fix)
+  json.x=0 -- workaround for 'already freed' bug
   local resp=radio.txpk(json.txpk)
   GW_stat.dwnb=GW_stat.dwnb+1
   print("txpk",data:sub(5))
@@ -216,7 +217,8 @@ local function receiver(router,data)
 end
 
 local function connectRouter()
-  router_client= net.createConnection(net.UDP)
+  --router_client=net.createConnection(net.UDP) -- depricated
+  router_client=net.createUDPSocket()
   router_client:on("receive", receiver)
   router_client:dns(CONFIG["GW_ROUTER"],function(sck,ip)
     print("router ip:",ip)
@@ -227,9 +229,11 @@ local function connectRouter()
 end
 
 -- start gateway
-wifi.sta.eventMonReg(wifi.STA_GOTIP, function()
+--wifi.sta.eventMonReg(wifi.STA_GOTIP, function() -- depricated
+wifi.eventmon.register(wifi.eventmon.STA_GOT_IP,function(T)
   -- stop eventloop
-  wifi.sta.eventMonStop()
+  --wifi.sta.eventMonStop() -- depricated
+  wifi.eventmon.unregister(wifi.eventmon.STA_GOT_IP)
   print("got ip",wifi.sta.getip())
   -- get GW id
   getGW_id()
@@ -266,4 +270,4 @@ end)
 
 -- startup
 wifi.sta.sethostname(CONFIG['GW_HOSTNAME'])
-wifi.sta.eventMonStart()
+--wifi.sta.eventMonStart() -- depricated
