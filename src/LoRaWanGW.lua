@@ -238,7 +238,7 @@ wifi.eventmon.register(wifi.eventmon.STA_GOT_IP,function(T)
   -- get GW id
   getGW_id()
   -- sync time
-  sntp.sync('nl.pool.ntp.org',function(s,us,server)
+  sntp.sync(CONFIG["GW_NTP_SERVER"],function(s,us,server)
     print("ntp synced using "..server)
     local t,us=rtctime.get()
     print(gmtime(t,us))
