@@ -68,28 +68,51 @@ Connections
 <tr><td>3.3V</td><td>VCC</td></tr>
 </table>
 
-## How to run
+## Installation instructions
+1. Get the firmware
+2. Flash the firmware to the ESP8266
+3. Reboot ESP8266
+4. Upload the .LUA files to the ESP8266
+5. Connect to ESP8266 and set config.
 
 The LoRaWanGateway needs quite some RAM and processing power, so it it necessary to flash firmware that uses 
-as little resources as possible. Therefore you have to build NodeMCU firmware containing only the modules 
-needed. The build I'm using can be found in the firmware directory, along with the NodeMCU flasher application.
+as little resources as possible. The firmware that we will use contains only the modules needed.
+There are two ways to obtain the minimum build:
++ Build and download the latest NodeMCU firmware on https://nodemcu-build.com/
 
-+ Use the firmware in the firmware directory
+	OR
 
-OR
++ Use the build that I supply in the firmware directory, along with the NodeMCU flasher application.
 
+### Steps to follow
+#### 1. Get the firmware
+##### Method A: Use the firmware that is supplied in this repository
+In the directory "firmware" look for the .bin file that starts with "nodemcu-master"
+##### Method B: Build your own firmware
 + Get the latest NodeMCU firmware on https://nodemcu-build.com/
 	+ select the master branch
 	+ select the following modules: bit, CJSON, encoder, file, GPIO, net, node, RTC time, SNTP, SPI, timer, UART, WiFi
-
-+ Flash the integer version on your ESP8266
-	+ connect your ESP8266 to a serial port
-	+ start ESP8266Flasher.exe in the firmware directory
-	+ choose the correct serial port
-	+ push the Flash button
-	
-+ Format ESP8266 filesystem
-
+#### 2. Flash the firmware to the ESP8266
+##### Method A: Windows only, use the GUI tool supplied in this repository
++ connect your ESP8266 to a serial port
++ start ESP8266Flasher.exe in the firmware directory
++ choose the correct serial port
++ push the Flash button
+##### Method B: Use the command line tool esptool.py
+A Python-based, open source, platform independent, utility.  
+https://nodemcu.readthedocs.io/en/master/en/flash/#esptoolpy
+##### Method C: Use the python GUI tool NodeMCU PyFlasher
+Self-contained NodeMCU flasher with GUI based on esptool.py and wxPython.  
+https://nodemcu.readthedocs.io/en/master/en/flash/#nodemcu-pyflasher
+#### 3. Reboot the ESP8266
+#### 4. Upload the .lua files to the ESP8266
+Suggested tool: nodemcu-uploader.py  
+https://github.com/kmpm/nodemcu-uploader  
++ Upload all files in the src directory to your ESP8266
++ Restart your ESP8266
++ The LoRaWanGateway will start after first compiling all your sources
+#### 5. Connect to the ESP8266 and set the config
+Use a serial connection at 115200 baud to connect and configure your gateway:
 + Register your wifi network
 	+ in the Lua shell run 
 		+ wifi.setmode(wifi.STATION)
@@ -98,14 +121,8 @@ OR
 		+ wifi.sta.connect()
 	+ Your ESP8266 will remember your wifi settings!
 	
-+ Upload all files in the src directory to your ESP8266
 
-+ Restart your ESP8266
-
-+ The LoRaWanGateway will start after first compiling all your sources
-
-
-## Configuration
+### Configuration
 The LoRaWanGateway is configured to listen for all spreadingsfactors on EU channel 0 (868.1 Mhz).
 
 The LoRaWanGateway can be run in two modes
