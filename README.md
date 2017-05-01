@@ -75,7 +75,7 @@ Connections
 4. Upload the .LUA files to the ESP8266
 5. Connect to ESP8266 and set config.
 
-The LoRaWanGateway needs quite some RAM and processing power, so it it necessary to flash firmware that uses 
+The LoRaWanGateway needs quite some RAM and processing power, so it is necessary to flash firmware that uses 
 as little resources as possible. The firmware that we will use contains only the modules needed.
 There are two ways to obtain the minimum build:
 + Build and download the latest NodeMCU firmware on https://nodemcu-build.com/
