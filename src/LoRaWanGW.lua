@@ -56,7 +56,7 @@ local function header(pkgType,r1,r2)
   if r1 == nil then r1=math.random(256)-1 end
   if r2 == nil then r2=math.random(256)-1 end
   return string.char(
-    0x01, --ProtocolVersion
+    CONFIG["GW_PROTO_VERSION"], --ProtocolVersion
     r1, -- RandomSeed
     r2, -- RandomSeed
     pkgType

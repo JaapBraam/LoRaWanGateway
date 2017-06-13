@@ -13,6 +13,7 @@ CONFIG["GW_ALT"]=0
 CONFIG["GW_NSS"]=0
 CONFIG["GW_DIO0"]=1
 CONFIG["GW_DIO1"]=2
+CONFIG["GW_PROTO_VERSION"]=0x02
 
 local function printConfig()
   print("Configuration")
@@ -29,6 +30,7 @@ local function printConfig()
   print("\tGW_NSS     ",CONFIG["GW_NSS"])
   print("\tGW_DIO0    ",CONFIG["GW_DIO0"])
   print("\tGW_DIO1    ",CONFIG["GW_DIO1"])
+  print("\tGW_PROTO_VERSION ",CONFIG["GW_PROTO_VERSION"])
 end
 
 local function saveConfig()
@@ -54,6 +56,10 @@ if file.exists('config.json') then
     CONFIG["GW_NTP_SERVER"]="nl.pool.ntp.org"
     saveConfig()
   end
+  if (not CONFIG["GW_PROTO_VERSION"]) then
+    CONFIG["GW_PROTO_VERSION"]=0x02
+    saveConfig()
+  end  
 else
   print("no config found, using default values")
 end
