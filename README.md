@@ -116,9 +116,13 @@ Use a serial connection at 115200 baud to connect and configure your gateway:
 + Register your wifi network
 	+ in the Lua shell run 
 		+ wifi.setmode(wifi.STATION)
-		+ wifi.sta.config("your SSID","your key")
+		-- connect to Access Point (DO save config to flash)
+		+ station_cfg={}
+		+ station_cfg.ssid="NODE-AABBCC"
+		+ station_cfg.pwd="password"
+		+ station_cfg.save=true
+		+ wifi.sta.config(station_cfg)
 		+ wifi.sta.autoconnect(1)
-		+ wifi.sta.connect()
 	+ Your ESP8266 will remember your wifi settings!
 	
 
